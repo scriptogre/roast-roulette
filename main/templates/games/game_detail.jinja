@@ -1,23 +1,32 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
-    {% if player %}
-        <span>
-            <h1 class="text-3xl">Game Code: {{ game.code }}</h1>
-            <h2 class="text-2xl">Player: {{ player.name }}</h2>
-        </span>
-
-        <form hx-post="{{ url('games:upload_photo', game.code) }}" hx-encoding='multipart/form-data'>
-            <input type="file" name="photo" accept="image/*" required>
-            <button type="submit">UPLOAD PHOTO 📸</button>
-        </form>
-
-        <div id="roulette-section">
-            <button hx-post="{{ url('games:spin_roulette', game.code) }}" hx-target="#roulette-section">
-                SPIN ROULETTE ({{ game.players.count() }} players)
-            </button>
+    <div class="flex flex-col justify-center items-center h-full">
+        <div class="flex flex-col items-center justify-center">
+            <span class="flex flex-col gap-1.5 items-center font-thin text-xl">
+                <iconify-icon icon="fa-solid:gamepad" class="text-2xl"></iconify-icon>
+                <span>Game Code</span>
+            </span>
+            <span class="text-6xl font-bold mt-3 uppercase">
+                {{ game.code|upper }}
+            </span>
         </div>
-    {% else %}
-        <h1 class="text-3xl">Game Code: {{ game.code }}</h1>
-    {% endif %}
+
+        <div class="h-0.5 w-60 rounded-full bg-neutral-300/10 my-12"></div>
+
+        <div class="flex items-center justify-center gap-12">
+            {% for player in game.players %}
+                <div class="relative flex flex-col justify-center items-center">
+                    <img src="{{ static('images/avatar/' ~ player.avatar ~ '.svg') }}"
+                         class="size-20 lg:size-28 object-center -translate-y-0.75"
+                         alt="{{ player.name }} Avatar"
+                    >
+                    <span class="text-xl lg:text-3xl mt-3">{{ player.name }}</span>
+                    {% if player.is_host %}
+                        <span class="text-xs lg:text-sm text-neutral-300 absolute -bottom-6">(Host)</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

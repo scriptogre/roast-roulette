@@ -4,12 +4,16 @@ for game sessions, players, uploaded photos, and roasts/clapbacks.
 """
 
 import shortuuid
+from django.core.validators import MinLengthValidator
 from django.db import models
 
 
 def generate_unique_code():
-    """Generates a short, unique 4-character code using the shortuuid library."""
-    return shortuuid.ShortUUID().random(length=4)
+    """Generates a short, unique 4-character code using uppercase letters and numbers."""
+    # Custom alphabet with uppercase letters and digits
+    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    su = shortuuid.ShortUUID(alphabet=alphabet)
+    return su.random(length=4)
 
 
 class Game(models.Model):
@@ -18,10 +22,10 @@ class Game(models.Model):
     """
 
     code = models.CharField(
-        max_length=6,
+        max_length=4,
         unique=True,
         default=generate_unique_code,
-        help_text='A unique 6-character game code for players to join.',
+        help_text='A unique 4-character game code for players to join.',
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -36,9 +40,11 @@ class Game(models.Model):
         help_text='Indicates if the game is ongoing or ended.',
     )
 
-    def add_player(self, name, session_id):
+    def add_player(self, name, avatar, session_id):
         """Creates a new player for this game."""
-        return Player.objects.create(game=self, name=name, session_id=session_id)
+        return Player.objects.create(
+            game=self, name=name, avatar=avatar, session_id=session_id
+        )
 
     def add_photo(self, player, image):
         """Adds a photo uploaded by a player to the game."""
@@ -59,6 +65,7 @@ class Player(models.Model):
     name = models.CharField(
         max_length=50,
         help_text="The player's display name.",
+        validators=[MinLengthValidator(3)],
     )
     session_id = models.CharField(
         max_length=32,
@@ -86,6 +93,10 @@ class Player(models.Model):
 
     class Meta:
         unique_together = ['game', 'session_id']
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 class Photo(models.Model):

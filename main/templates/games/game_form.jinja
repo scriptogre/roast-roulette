@@ -4,23 +4,26 @@
     <div class="flex flex-col justify-center items-center h-full">
 
         <form id="game-form"
-              class="flex flex-col items-center p-8 bg-neutral-300/2.5 border border-neutral-300/5 rounded-xl"
+              class="peer flex flex-col items-center rounded-xl"
                 {% if is_joining %}
-              hx-post="{{ url('games:join') }}"
+              action="{{ url('games:join') }}"
                 {% else %}
-              hx-post="{{ url('games:create') }}"
+              action="{{ url('games:create') }}"
                 {% endif %}
+              method="POST"
         >
             {% csrf_token %}
             <div class="relative flex items-center">
+                {% set avatar = range(1, 8)|random %}
+
                 {# Holds the value of the selected avatar #}
-                <input type="hidden" name="avatar" value="1">
+                <input type="hidden" name="avatar" value="{{ avatar }}">
 
                 {# Avatar image #}
-                <img src="{{ static('images/avatar/1.svg') }}" class="size-32 object-center -translate-y-0.75" alt="Avatar">
+                <img src="{{ static('images/avatar/'~avatar~'.svg') }}" class="size-32 lg:size-40 object-center -translate-y-0.75" alt="Avatar">
 
                 {# Button to randomize the avatar #}
-                <button class="absolute group right-0 bottom-0 inline-flex justify-center items-center cursor-pointer" type="button"
+                <button class="absolute group -right-0.5 -bottom-0.5 inline-flex justify-center items-center cursor-pointer active:scale-[1.1] transition-all" type="button"
                         onclick="
                                 // Randomize input value (1 - 8)
                                 // Ensure it's not the same as the current value
@@ -36,28 +39,29 @@
                                 document.querySelector('img').src = `{{ static('images/avatar/') }}${newValue}.svg`;
                                 "
                 >
-                    <iconify-icon icon="fa6-solid:rotate-left" class="text-xl group-hover:text-white"></iconify-icon>
+                    <iconify-icon icon="fa6-solid:rotate-left" class="text-xl lg:text-2xl group-hover:text-white transition-color"></iconify-icon>
                 </button>
             </div>
 
-            <label class="relative mt-4">
-                <iconify-icon icon="solar:user-bold" class="absolute scale-[1.2] left-3 top-1/2 -translate-y-[calc(50%+1px)] translate-x-0.5"></iconify-icon>
-                <input class="rounded-lg border ps-11 pe-3 py-2 outline-none border-1 border-neutral-300/20 placeholder-neutral-300"
+            <label class="relative mt-6">
+                <iconify-icon icon="solar:user-bold" class="absolute text-xl lg:text-2xl left-3 lg:left-4 top-1/2 translate-y-[calc(-50%-1px)] translate-x-0.5"></iconify-icon>
+                <input class="text-lg lg:text-xl rounded-lg border ps-11 lg:ps-14 pe-3 py-2 lg:py-3 outline-none border-1 border-neutral-300/20 placeholder-neutral-500"
                        type="text"
                        name="player_name"
                        placeholder="Enter a nickname"
+                       minlength="3"
                        required
                 />
             </label>
 
             {% if is_joining %}
-                <label class="relative mt-4">
-                    <iconify-icon icon="fa-solid:gamepad" class="absolute left-3 top-1/2 -translate-y-1/2"></iconify-icon>
-                    <input class="rounded-lg border ps-11 pe-3 py-2 outline-none border-1 border-neutral-300/20 placeholder-neutral-300"
+                <label class="relative mt-6">
+                    <iconify-icon icon="fa-solid:gamepad" class="absolute text-xl lg:text-2xl left-3 lg:left-4 top-1/2 translate-y-[calc(-50%-1px)] scale-[0.9]"></iconify-icon>
+                    <input class="text-lg lg:text-xl rounded-lg border ps-11 lg:ps-14 pe-3 py-2 lg:py-3 outline-none border-1 border-neutral-300/20 uppercase placeholder-neutral-500 placeholder:normal-case"
                            type="text"
                            name="game_code"
                            placeholder="Enter game code"
-                           maxlength="6"
+                           maxlength="4"
                            required
                     />
                 </label>
@@ -65,8 +69,8 @@
         </form>
 
         {# Submits the #game-form #}
-        <button form="game-form" type="submit" class="group p-4 mt-4 text-3xl hover:text-white hover:scale-[115%] hover:rotate-[1deg] transition-all cursor-pointer">
-            <span class="font-bold relative after:absolute after:left-0 after:top-0 after:content-['Go_!'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:-translate-x-0.75 after:transition-all">
+        <button form="game-form" type="submit" class="opacity-0 invisible peer-valid:opacity-100 peer-valid:visible peer-valid:translate-y-4 group p-4 text-5xl hover:text-white hover:scale-[115%] hover:rotate-[1deg] transition-all cursor-pointer">
+            <span class="font-bold relative after:absolute after:left-0 after:top-1 after:content-['Go_!'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:-translate-x-0.75 after:transition-all">
                 Go !
             </span>
         </button>
