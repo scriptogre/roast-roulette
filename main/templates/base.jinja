@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" class="text-neutral-800 dark:text-neutral-300">
+<head>
+    <title>Roast Roulette</title>
+
+    <!-- TailwindCSS (https://tailwindcss.com/docs/installation/play-cdn) -->
+    <script defer src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <!-- HTMX (https://htmx.org/) -->
+    <script defer src="https://unpkg.com/htmx.org@2.0.4"></script>
+    {{ django_htmx_script() }}
+
+    <!-- Google Fonts (https://fonts.google.com/) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+    <style>
+        html {font-family: 'Oxanium', sans-serif}
+    </style>
+
+    <!-- Iconify Icons (https://iconify.design/docs/iconify-icon/#registering-the-web-component) -->
+    <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+</head>
+<body class="h-screen relative bg-linear-175 from-[#1A1320] from-50% to-[#2A1D40] bg-fixed text-neutral-300"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+{% block content %}
+    {# Content from child templates will be inserted here #}
+{% endblock %}
+</body>
+</html>

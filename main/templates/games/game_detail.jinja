@@ -1,0 +1,23 @@
+{% extends 'base.jinja' %}
+
+{% block content %}
+    {% if player %}
+        <span>
+            <h1 class="text-3xl">Game Code: {{ game.code }}</h1>
+            <h2 class="text-2xl">Player: {{ player.name }}</h2>
+        </span>
+
+        <form hx-post="{{ url('games:upload_photo', game.code) }}" hx-encoding='multipart/form-data'>
+            <input type="file" name="photo" accept="image/*" required>
+            <button type="submit">UPLOAD PHOTO 📸</button>
+        </form>
+
+        <div id="roulette-section">
+            <button hx-post="{{ url('games:spin_roulette', game.code) }}" hx-target="#roulette-section">
+                SPIN ROULETTE ({{ game.players.count() }} players)
+            </button>
+        </div>
+    {% else %}
+        <h1 class="text-3xl">Game Code: {{ game.code }}</h1>
+    {% endif %}
+{% endblock %}

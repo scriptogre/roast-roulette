@@ -1,0 +1,22 @@
+{% extends 'base.jinja' %}
+
+{% block content %}
+    <div class="flex flex-col lg:flex-row justify-center items-center h-full p-12 gap-12">
+
+        {# Opens form to enter name, create game, and host #}
+        <a href="{{ url('games:create') }}" class="group h-96 flex justify-center items-center w-full border-2 border-transparent hover:border-pink-600/50 rounded-3xl hover:scale-[102%] transition-all cursor-pointer">
+            <span class="text-5xl lg:text-7xl group-hover:text-white font-bold relative after:absolute after:translate-y-1 after:left-0 after:top-0 after:content-['Create_Game'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:translate-x-0.5 after:transition-all">
+                Create Game
+            </span>
+        </a>
+
+        <div class="h-0.5 w-60 lg:h-60 lg:w-1 rounded-full bg-pink-600/25"></div>
+
+        {# Opens form to enter name, join game with code, and play #}
+        <a href="{{ url('games:join') }}" class="group h-96 flex justify-center items-center w-full border-2 border-transparent hover:border-pink-600/50 rounded-3xl hover:scale-[102%] transition-all cursor-pointer">
+            <span class="text-5xl lg:text-7xl group-hover:text-white font-bold relative after:absolute after:translate-y-1 after:left-0 after:top-0 after:content-['Join_Game'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:-translate-x-0.5 after:transition-all">
+                Join Game
+            </span>
+        </a>
+    </div>
+{% endblock %}
