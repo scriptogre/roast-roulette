@@ -4,8 +4,12 @@
     <div class="flex flex-col lg:flex-row justify-center items-center h-full p-12 gap-12">
 
         {# Opens form to enter name, create game, and host #}
-        <a href="{{ url('games:create') }}" class="group h-96 flex justify-center items-center w-full rounded-3xl hover:scale-[102%] transition-all cursor-pointer">
-            <span class="text-5xl lg:text-7xl group-hover:text-white font-bold relative after:absolute after:translate-y-1 after:left-0 after:top-0 after:content-['Create_Game'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:translate-x-0.5 after:transition-all">
+        <a href="{{ url('games:create') }}" class="group h-96 flex flex-col justify-center items-center w-full rounded-3xl hover:scale-[1.05] active:scale-[1.1] hover:rotate-[1deg] transition-all cursor-pointer">
+            <div class="relative size-16 lg:size-24 mb-8">
+                <iconify-icon icon="fa-solid:plus" class="absolute inset-0 size-16 lg:size-24 scale-[1.1] group-hover:text-white transition-all z-10" height="none"></iconify-icon>
+                <iconify-icon icon="fa-solid:plus" class="absolute inset-0 size-16 lg:size-24 scale-[1.1] text-pink-700 group-hover:text-pink-500 translate-y-1 group-hover:-translate-x-0.5 transition-all -z-10" height="none"></iconify-icon>
+            </div>
+            <span class="text-5xl lg:text-6xl group-hover:text-white font-bold relative after:absolute after:translate-y-1 after:left-0 after:top-0 after:content-['Create_Game'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:-translate-x-1 transition-all after:transition-all">
                 Create Game
             </span>
         </a>
@@ -13,8 +17,12 @@
         <div class="h-0.5 w-32 lg:h-32 lg:w-1 rounded-full bg-neutral-300/5"></div>
 
         {# Opens form to enter name, join game with code, and play #}
-        <a href="{{ url('games:join') }}" class="group h-96 flex justify-center items-center w-full rounded-3xl hover:scale-[102%] transition-all cursor-pointer">
-            <span class="text-5xl lg:text-7xl group-hover:text-white font-bold relative after:absolute after:translate-y-1 after:left-0 after:top-0 after:content-['Join_Game'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:-translate-x-0.5 after:transition-all">
+        <a href="{{ url('games:join') }}" class="group h-96 flex flex-col justify-center items-center w-full rounded-3xl hover:scale-[1.05] active:scale-[1.1] hover:rotate-[-1deg] transition-all cursor-pointer">
+            <div class="relative size-16 lg:size-24 mb-8">
+                <iconify-icon icon="fa-solid:link" class="inset-0 absolute size-16 lg:size-24 group-hover:text-white transition-all z-10" height="none"></iconify-icon>
+                <iconify-icon icon="fa-solid:link" class="inset-0 absolute size-16 lg:size-24 text-pink-700 group-hover:text-pink-500 translate-y-1 group-hover:translate-x-0.5 transition-all -z-10" height="none"></iconify-icon>
+            </div>
+            <span class="text-5xl lg:text-6xl group-hover:text-white font-bold relative after:absolute after:translate-y-1 after:left-0 after:top-0 after:content-['Join_Game'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:translate-x-1 transition-all after:transition-all">
                 Join Game
             </span>
         </a>

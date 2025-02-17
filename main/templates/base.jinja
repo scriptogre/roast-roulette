@@ -8,7 +8,11 @@
 
     <!-- HTMX (https://htmx.org/) -->
     <script defer src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script defer src="https://unpkg.com/htmx-ext-ws@2.0.2"></script>
     {{ django_htmx_script() }}
+
+    <!-- Hyperscript (https://hyperscript.org/) -->
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
 
     <!-- Google Fonts (https://fonts.google.com/) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,8 +22,14 @@
         html {font-family: 'Oxanium', sans-serif}
     </style>
 
-    <!-- Iconify Icons (https://iconify.design/docs/iconify-icon/#registering-the-web-component) -->
+    <!-- <qr-code> Web Component (https://github.com/bitjson/qr-code) -->
+    <script src="https://unpkg.com/@bitjson/qr-code@1.0.2/dist/qr-code.js"></script>
+
+    <!-- <iconify-icon> Web Component (https://iconify.design/docs/iconify-icon/#registering-the-web-component) -->
     <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+
+    <!-- Favicons -->
+    <link rel="icon" href="{{ static('images/logo.svg') }}" type="image/svg+xml">
 </head>
 <body class="h-screen relative bg-linear-175 from-[#1A1320] from-50% to-[#2A1D40] bg-fixed text-neutral-300"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>

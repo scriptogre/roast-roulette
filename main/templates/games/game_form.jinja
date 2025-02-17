@@ -1,10 +1,19 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
-    <div class="flex flex-col justify-center items-center h-full">
+    <div class="flex flex-col items-center justify-center h-full max-w-xs mx-auto">
+
+        <div class="flex justify-center items-center w-full">
+            <a href="{{ url('games:index') }}" class="group inline-flex items-center gap-1.5 p-3 hover:scale-[1.05] active:scale-[1.1] transition-transform">
+                <iconify-icon icon="typcn:arrow-back" class="text-xl lg:text-2xl text-neutral-300 group-hover:text-white transition-colors"></iconify-icon>
+                <span class="text-lg lg:text-xl font-semibold group-hover:text-white translate-y-px transition-colors">
+                    Back
+                </span>
+            </a>
+        </div>
 
         <form id="game-form"
-              class="peer flex flex-col items-center rounded-xl"
+              class="peer flex flex-col items-center rounded-xl mt-6"
                 {% if is_joining %}
               action="{{ url('games:join') }}"
                 {% else %}
@@ -23,7 +32,7 @@
                 <img src="{{ static('images/avatar/'~avatar~'.svg') }}" class="size-32 lg:size-40 object-center -translate-y-0.75" alt="Avatar">
 
                 {# Button to randomize the avatar #}
-                <button class="absolute group -right-0.5 -bottom-0.5 inline-flex justify-center items-center cursor-pointer active:scale-[1.1] transition-all" type="button"
+                <button class="absolute group -right-0.5 -bottom-0.5 inline-flex justify-center items-center cursor-pointer hover:scale-[1.1] active:scale-[1.2] transition-all" type="button"
                         onclick="
                                 // Randomize input value (1 - 8)
                                 // Ensure it's not the same as the current value
@@ -39,7 +48,7 @@
                                 document.querySelector('img').src = `{{ static('images/avatar/') }}${newValue}.svg`;
                                 "
                 >
-                    <iconify-icon icon="fa6-solid:rotate-left" class="text-xl lg:text-2xl group-hover:text-white transition-color"></iconify-icon>
+                    <iconify-icon icon="fa6-solid:rotate-left" class="text-lg lg:text-xl group-hover:text-white transition-color"></iconify-icon>
                 </button>
             </div>
 
@@ -48,20 +57,21 @@
                 <input class="text-lg lg:text-xl rounded-lg border ps-11 lg:ps-14 pe-3 py-2 lg:py-3 outline-none border-1 border-neutral-300/20 placeholder-neutral-500"
                        type="text"
                        name="player_name"
-                       placeholder="Enter a nickname"
+                       placeholder="Enter nickname"
                        minlength="3"
                        required
                 />
             </label>
 
             {% if is_joining %}
-                <label class="relative mt-6">
+                <label class="relative mt-3">
                     <iconify-icon icon="fa-solid:gamepad" class="absolute text-xl lg:text-2xl left-3 lg:left-4 top-1/2 translate-y-[calc(-50%-1px)] scale-[0.9]"></iconify-icon>
                     <input class="text-lg lg:text-xl rounded-lg border ps-11 lg:ps-14 pe-3 py-2 lg:py-3 outline-none border-1 border-neutral-300/20 uppercase placeholder-neutral-500 placeholder:normal-case"
                            type="text"
                            name="game_code"
-                           placeholder="Enter game code"
+                           placeholder="Enter 4-digit code"
                            maxlength="4"
+                           minlength="4"
                            required
                     />
                 </label>
@@ -69,9 +79,12 @@
         </form>
 
         {# Submits the #game-form #}
-        <button form="game-form" type="submit" class="opacity-0 invisible peer-valid:opacity-100 peer-valid:visible peer-valid:translate-y-4 group p-4 text-5xl hover:text-white hover:scale-[115%] hover:rotate-[1deg] transition-all cursor-pointer">
-            <span class="font-bold relative after:absolute after:left-0 after:top-1 after:content-['Go_!'] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:-translate-x-0.75 after:transition-all">
-                Go !
+        {% set button_label = 'Join' if is_joining else 'Create'  %}
+        <button form="game-form" type="submit" class="opacity-0 invisible peer-valid:opacity-100 peer-valid:visible group p-4 mt-2 text-4xl hover:text-white hover:scale-[115%] hover:rotate-[1deg] transition-all duration-200 cursor-pointer">
+            <span class="font-bold relative after:absolute after:left-0 after:top-px after:content-[attr(data-label)] after:-z-10 after:text-pink-700 group-hover:after:text-pink-500 group-hover:after:-translate-x-0.75 after:transition-all"
+                  data-label="{{ button_label }}"
+            >
+                {{ button_label }}
             </span>
         </button>
     </div>

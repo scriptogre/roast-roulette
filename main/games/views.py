@@ -3,6 +3,8 @@ Handles HTTP requests/responses for the 'games' app. Includes logic for creating
 uploading photos, spinning the "roast roulette," and submitting clapbacks.
 """
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -84,6 +86,11 @@ def game_join_view(request):
 
         # Add player to game
         game.add_player(player_name, avatar, session_id=request.session.session_key)
+
+        # Send data to all clients listening in the group "game_{game_code}"
+        async_to_sync(get_channel_layer().group_send)(
+            game_code, {'type': 'update_game'}
+        )
 
         return redirect('games:detail', game_code=game.code)
 

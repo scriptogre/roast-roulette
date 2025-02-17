@@ -1,29 +1,57 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
-    <div class="flex flex-col justify-center items-center h-full">
-        <div class="flex flex-col items-center justify-center">
-            <span class="flex flex-col gap-1.5 items-center font-thin text-xl">
-                <iconify-icon icon="fa-solid:gamepad" class="text-2xl"></iconify-icon>
-                <span>Game Code</span>
-            </span>
-            <span class="text-6xl font-bold mt-3 uppercase">
-                {{ game.code|upper }}
-            </span>
+    <div class="flex flex-col justify-center items-center h-full starting:opacity-0"
+         hx-get="{{ url('games:detail', game_code=game.code) }}"
+         hx-trigger="updateGame"
+         _="on htmx:wsBeforeMessage from body
+                log event
+                if event.detail.message includes 'updateGame'
+                    trigger updateGame
+            "
+    >
+        <div class="flex flex-col items-center justify-center gap-3">
+            <div class="flex flex-col items-center">
+                <span class="text-base lg:text-lg">
+                    Scan QR
+                </span>
+                <qr-code contents="https://{{ request.get_host() }}/{{ game.code }}/"
+                         module-color="#D4D4D4"
+                         position-ring-color="#D4D4D4"
+                         position-center-color="#D4D4D4"
+                         class="size-48"
+                >
+                </qr-code>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-base lg:text-lg">
+                    Or enter code
+                </span>
+                <span class="text-6xl font-bold uppercase mt-1.5">
+                    {{ game.code|upper }}
+                </span>
+            </div>
         </div>
 
         <div class="h-0.5 w-60 rounded-full bg-neutral-300/10 my-12"></div>
 
-        <div class="flex items-center justify-center gap-12">
+        <div class="flex items-start justify-center gap-12"
+             hx-ext="ws"
+             ws-connect="/{{ game.code }}/"
+        >
             {% for player in game.players %}
-                <div class="relative flex flex-col justify-center items-center">
+                <div class="flex flex-col justify-center items-center starting:opacity-0 opacity-100 transition-opacity">
                     <img src="{{ static('images/avatar/' ~ player.avatar ~ '.svg') }}"
-                         class="size-20 lg:size-28 object-center -translate-y-0.75"
+                         class="size-20 lg:size-28"
                          alt="{{ player.name }} Avatar"
                     >
-                    <span class="text-xl lg:text-3xl mt-3">{{ player.name }}</span>
+                    <span class="text-xl lg:text-2xl mt-3">{{ player.name }}</span>
                     {% if player.is_host %}
-                        <span class="text-xs lg:text-sm text-neutral-300 absolute -bottom-6">(Host)</span>
+                        <span class="inline-flex items-center lg:text-lg text-neutral-300 mt-1.5">
+                            <span class="font-bold">
+                                Host
+                            </span>
+                        </span>
                     {% endif %}
                 </div>
             {% endfor %}

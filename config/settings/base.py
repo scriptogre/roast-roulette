@@ -68,6 +68,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
 
+# CHANNELS
+# ------------------------------------------------------------------------------
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
 # ADMIN
 # ------------------------------------------------------------------------------
 ADMIN_URL = env('DJANGO_ADMIN_URL', default='admin/')
