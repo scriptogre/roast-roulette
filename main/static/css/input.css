@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-neutral-350: #BBBBBB;
+}
+
+@layer base {
+  iconify-icon {
+    @apply inline-block size-[1em]
+  }
+}
+
+@layer utilities {
+  /* For Webkit-based browsers (Chrome, Safari and Opera) */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* For IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}

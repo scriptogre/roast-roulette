@@ -12,10 +12,10 @@ up *args:
     trap 'kill 0' EXIT
 
     # Start Django
-    docker compose up &
+    docker compose -f docker-compose.local.yml up &
 
     # Start Tailwind CSS CLI
-    # ./tailwindcss -i ./main/static/css/input.css -o ./main/static/css/output.css --watch --minify
+     ./tailwindcss -i ./main/static/css/input.css -o ./main/static/css/output.css --watch --minify
 
     # Open browser
     (sleep 2 && uv run -m webbrowser http://localhost:8000)
@@ -25,22 +25,22 @@ up *args:
 
 # Run `python manage.py makemigrations`
 makemigrations *args:
-    docker compose run --rm django python manage.py makemigrations {{ args }}
+    docker compose -f docker-compose.local.yml run --rm django python manage.py makemigrations {{ args }}
 
 
 # Run `python manage.py migrate`
 migrate:
-    docker compose run --rm django python manage.py migrate
+    docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
 
 
 # Run `{cmd}` in django container
 exec +cmd:
-    docker compose run --rm django {{ cmd }}
+    docker compose -f docker-compose.local.yml run --rm django {{ cmd }}
 
 
 # Destroy containers & volumes
 destroy:
-    docker compose down --volumes
+    docker compose -f docker-compose.local.yml down --volumes
 
 
 # Tailwind CSS CLI setup
@@ -52,7 +52,7 @@ setup-tailwindcss-cli:
         exit 0
     fi
 
-    TAILWIND_VERSION="4.0.1"
+    TAILWIND_VERSION="4.0.6"
     BASE_URL="https://github.com/tailwindlabs/tailwindcss/releases/download/v${TAILWIND_VERSION}"
     echo "Select your operating system and architecture:"
     echo "1) Linux (ARM64)"

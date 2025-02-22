@@ -1,4 +1,4 @@
-# Get environment as build arg (from docker-compose.yml, defaults to 'local')
+# Get environment as build arg (from docker-compose.local.yml, defaults to 'local')
 ARG ENVIRONMENT=local
 
 FROM python:3.12.7-slim-bookworm AS builder

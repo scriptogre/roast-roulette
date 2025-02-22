@@ -16,7 +16,6 @@ dependencies = [
     "Django", # https://github.com/django/django
     "django-environ", # https://github.com/joke2k/django-environ
     "django-allauth[socialaccount]", # https://github.com/pennersr/django-allauth
-    "django-redis", # https://github.com/jazzband/django-redis
     "django-htmx", # https://github.com/adamchainz/django-htmx
     "django-jinja", # https://github.com/niwinz/django-jinja
     "jinjax", # https://github.com/jpsca/jinjax
@@ -29,6 +28,7 @@ dependencies = [
     "channels", # https://github.com/django/channels
     "shortuuid",
     "Pillow",
+    "openai>=1.63.2",
 ]
 
 

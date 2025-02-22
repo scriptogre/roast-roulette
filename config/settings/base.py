@@ -14,13 +14,13 @@ env = environ.Env()
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = env.bool('DJANGO_DEBUG', True)
+DEBUG = env.bool('DJANGO_DEBUG')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = env.str('DJANGO_SECRET_KEY', 'space-station')
+SECRET_KEY = env.str('DJANGO_SECRET_KEY')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = 'UTC'
@@ -172,6 +172,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
+    'main.games.middleware.EnsureSessionMiddleware',
 ]
 
 
@@ -185,8 +186,9 @@ STATIC_URL = '/static/'
 
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'config.finders.CustomAppDirectoriesFinder',
 ]
+STATICFILES_IGNORE = ['css/input.css']  # Path relative to STATICFILES_DIRS
 
 
 # MEDIA
@@ -195,8 +197,10 @@ STATICFILES_FINDERS = [
 MEDIA_ROOT = str(APPS_DIR / 'media')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = '/media/'
+MEDIA_URL = ''
 
+# Fix permission errors for files uploaded to NAS
+FILE_UPLOAD_PERMISSIONS = None
 
 # TEMPLATES
 # ------------------------------------------------------------------------------
@@ -276,3 +280,8 @@ LOGGING = {
     },
     'root': {'level': 'DEBUG', 'handlers': ['console']},
 }
+
+
+# APIs
+# ------------------------------------------------------------------------------
+XAI_API_KEY = env.str('XAI_API_KEY')
