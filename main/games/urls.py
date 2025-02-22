@@ -21,9 +21,6 @@ urlpatterns = [
     path('create/', views.game_create_view, name='create'),
     path('join/', views.game_join_view, name='join'),
     path('<str:game_code>/', views.game_detail_view, name='detail'),
-    path('<str:game_code>/upload/', views.upload_photo_view, name='upload_photo'),
-    path('<str:game_code>/spin/', views.spin_roulette_view, name='spin_roulette'),
-    path(
-        '<int:roast_id>/clapback/', views.submit_clapback_view, name='submit_clapback'
-    ),
+    path('<str:game_code>/start/', views.game_start_view, name='start'),
+    path('<str:game_code>/upload_photo/', views.upload_photo_view, name='upload_photo'),
 ]

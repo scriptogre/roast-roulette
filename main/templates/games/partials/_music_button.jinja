@@ -1,0 +1,18 @@
+<button class="group fixed right-4 lg:right-8 top-4 p-2 z-10 cursor-pointer{% if not request.htmx %} starting:invisible starting:opacity-0 delay-300 duration-300 ease-in-out transition-all{% endif %}"
+        hx-on:click="let music = htmx.find('#music'); music.paused ? music.play() : music.pause()"
+        hx-preserve
+>
+    <!-- Background Music -->
+    <audio id="music"
+           src="{{ static('audio/background.mp3') }}"
+           loop
+           hx-on:play="htmx.find('#is-music-playing').checked = true"
+           hx-on:pause="htmx.find('#is-music-playing').checked = false"
+           hx-preserve
+    ></audio>
+    <!-- Background Music State -->
+    <input id="is-music-playing" type="checkbox" class="peer hidden" hx-preserve>
+
+    <iconify-icon id="icon-background-music-off" icon="ix:sound-off-filled" class="peer-checked:hidden size-6 sm:size-6.75 lg:size-7.5 2xl:size-8 text-neutral-500" height="none"></iconify-icon>
+    <iconify-icon id="icon-background-music-on" icon="ix:sound-loud-filled" class="hidden peer-checked:block size-6 sm:size-6.75 lg:size-7.5 2xl:size-8 text-pink-700" height="none"></iconify-icon>
+</button>

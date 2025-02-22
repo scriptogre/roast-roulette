@@ -1,18 +1,30 @@
 <!doctype html>
-<html lang="en" class="text-neutral-800 dark:text-neutral-300">
+<html lang="en">
 <head>
     <title>Roast Roulette</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <!-- TailwindCSS (https://tailwindcss.com/docs/installation/play-cdn) -->
-    <script defer src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ static('favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ static('favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ static('favicon.ico') }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ static('apple-touch-icon.png') }}" />
+    <meta name="apple-mobile-web-app-title" content="Roast Roulette" />
+
+    <!-- Manifest (https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest) -->
+    <link rel="manifest" href="{{ static('manifest.json') }}">
 
     <!-- HTMX (https://htmx.org/) -->
     <script defer src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <!-- WebSockets Extension (https://htmx.org/extensions/ws/) -->
     <script defer src="https://unpkg.com/htmx-ext-ws@2.0.2"></script>
+    <!-- Idiomorph Extension (https://htmx.org/extensions/idiomorph/) -->
+    <script defer src="https://unpkg.com/idiomorph@0.7.1"></script>
+    <!-- Django-HTMX Extension Script (https://django-htmx.readthedocs.io/en/latest/extension_script.html) -->
     {{ django_htmx_script() }}
 
     <!-- Hyperscript (https://hyperscript.org/) -->
-    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+    <script defer src="https://unpkg.com/hyperscript.org@0.9.14"></script>
 
     <!-- Google Fonts (https://fonts.google.com/) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,12 +41,20 @@
     <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
 
     <!-- Favicons -->
-    <link rel="icon" href="{{ static('images/logo.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ static('images/logo.png') }}" type="image/png">
+
+    <!-- TailwindCSS -->
+    <link href="{{ static('css/output.css') }}" rel="stylesheet">
 </head>
-<body class="h-screen relative bg-linear-175 from-[#1A1320] from-50% to-[#2A1D40] bg-fixed text-neutral-300"
-      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-{% block content %}
-    {# Content from child templates will be inserted here #}
-{% endblock %}
+<body class="bg-linear-175 from-[#1A1320] from-50% to-[#2A1D40] bg-fixed text-neutral-300 touch-manipulation"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      hx-boost="true"
+>
+
+<main class="h-dvh overflow-hidden absolute inset-0 p-4 lg:p-8 flex-1 flex flex-col items-center w-full max-w-7xl mx-auto starting:opacity-0 starting:scale-[1.02] duration-300 transition-all ease-in-out">
+    {% block content %}
+        {# Content from child templates will be inserted here #}
+    {% endblock %}
+</main>
 </body>
 </html>

@@ -17,8 +17,8 @@ if [ "$ENVIRONMENT" = "local" ]; then
 
     echo "Running in local development mode"
 
-    # gunicorn w/ uvicorn workers & auto-reload
-    exec gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --reload
+    # uvicorn w/ auto-reload
+    exec uvicorn config.asgi:application --host 0.0.0.0 --reload
 
 elif [ "$ENVIRONMENT" = "production" ] || [ "$ENVIRONMENT" = "staging" ]; then
     # Production

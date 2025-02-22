@@ -1,0 +1,21 @@
+{% set target_photo_index = (round.photos.all()|list).index(round.target_photo) + 1  %}
+
+<div class="flex-1 flex justify-center items-center"
+     style="--target-photo-index: {{ target_photo_index }};
+             --photo-width: 300px;
+             --gap-width: 2rem;
+             --start-position: calc(1.5 * var(--photo-width) + 2 * var(--gap-width) + 4px);
+             --center-of-target-photo: calc(var(--start-position)  -  (var(--photo-width) + var(--gap-width)) * var(--target-photo-index));">
+    <div class="flex items-center justify-start w-2xl mx-auto gap-[var(--gap-width)]">
+        {% for photo in round.photos.all() %}
+            <figure class="relative inline-grid place-content-center w-[var(--photo-width)] min-w-[var(--photo-width)] max-w-[var(--photo-width)]
+                               starting:translate-x-[var(--start-position)] translate-x-[var(--center-of-target-photo)]
+                               duration-[5s] ease-in-out">
+                <img src="{{ photo.image.url }}" class="object-cover rounded-3xl
+                                                {{ 'starting:brightness-25 brightness-100 starting:scale-[1] scale-[1.05] delay-[4s] duration-500 ease-in-out' if loop.index == target_photo_index
+                                                else 'brightness-25' }}"
+                />
+            </figure>
+        {% endfor %}
+    </div>
+</div>

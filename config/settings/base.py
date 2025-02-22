@@ -3,24 +3,24 @@
 
 from pathlib import Path
 
-import environ
+import environs
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / 'main'
 
 # Create env object
-env = environ.Env()
+env = environs.Env()
 
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = env.bool('DJANGO_DEBUG', True)
+DEBUG = env.bool('DJANGO_DEBUG')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = env.str('DJANGO_SECRET_KEY', 'space-station')
+SECRET_KEY = env.str('DJANGO_SECRET_KEY')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = 'UTC'
@@ -47,13 +47,35 @@ LOCALE_PATHS = [str(BASE_DIR / 'locale')]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'data' / 'db.sqlite3',
     }
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = False
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# REDIS
+# ------------------------------------------------------------------------------
+REDIS_URL = env.str('REDIS_URL')
+
+
+# CACHES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#caches
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': REDIS_URL,
+    },
+}
+
+
+# SESSIONS
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 
 # URLS
@@ -72,7 +94,10 @@ ASGI_APPLICATION = 'config.asgi.application'
 # ------------------------------------------------------------------------------
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [REDIS_URL],
+        },
     },
 }
 
@@ -172,6 +197,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
+    'main.games.middleware.EnsureSessionMiddleware',
 ]
 
 
@@ -185,8 +211,9 @@ STATIC_URL = '/static/'
 
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'config.finders.CustomAppDirectoriesFinder',
 ]
+STATICFILES_IGNORE = ['css/input.css']  # Path relative to STATICFILES_DIRS
 
 
 # MEDIA
@@ -195,8 +222,10 @@ STATICFILES_FINDERS = [
 MEDIA_ROOT = str(APPS_DIR / 'media')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = '/media/'
+MEDIA_URL = ''
 
+# Fix permission errors for files uploaded to NAS
+FILE_UPLOAD_PERMISSIONS = None
 
 # TEMPLATES
 # ------------------------------------------------------------------------------
@@ -276,3 +305,8 @@ LOGGING = {
     },
     'root': {'level': 'DEBUG', 'handlers': ['console']},
 }
+
+
+# APIs
+# ------------------------------------------------------------------------------
+XAI_API_KEY = env.str('XAI_API_KEY')

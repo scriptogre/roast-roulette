@@ -1,60 +1,79 @@
 {% extends 'base.jinja' %}
 
 {% block content %}
-    <div class="flex flex-col justify-center items-center h-full starting:opacity-0"
+
+    <!-- Game Screen -->
+    <div id="game-screen"
+         class="size-full flex flex-col justify-center items-center"
+         hx-ext="ws"
+         ws-connect="/{{ game.code }}/"
+         hx-trigger="htmx:wsBeforeMessage[event.detail.message=='refreshGame'] from:body"
          hx-get="{{ url('games:detail', game_code=game.code) }}"
-         hx-trigger="updateGame"
-         _="on htmx:wsBeforeMessage from body
-                log event
-                if event.detail.message includes 'updateGame'
-                    trigger updateGame
-            "
+         hx-target="body"
+         hx-swap="morph"
     >
-        <div class="flex flex-col items-center justify-center gap-3">
-            <div class="flex flex-col items-center">
-                <span class="text-base lg:text-lg">
-                    Scan QR
-                </span>
-                <qr-code contents="https://{{ request.get_host() }}/{{ game.code }}/"
-                         module-color="#D4D4D4"
-                         position-ring-color="#D4D4D4"
-                         position-center-color="#D4D4D4"
-                         class="size-48"
-                >
-                </qr-code>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-base lg:text-lg">
-                    Or enter code
-                </span>
-                <span class="text-6xl font-bold uppercase mt-1.5">
-                    {{ game.code|upper }}
-                </span>
-            </div>
-        </div>
+        {% if game.is_lobby %}
 
-        <div class="h-0.5 w-60 rounded-full bg-neutral-300/10 my-12"></div>
+            {% include 'games/partials/_lobby.jinja' %}
 
-        <div class="flex items-start justify-center gap-12"
-             hx-ext="ws"
-             ws-connect="/{{ game.code }}/"
-        >
-            {% for player in game.players %}
-                <div class="flex flex-col justify-center items-center starting:opacity-0 opacity-100 transition-opacity">
-                    <img src="{{ static('images/avatar/' ~ player.avatar ~ '.svg') }}"
-                         class="size-20 lg:size-28"
-                         alt="{{ player.name }} Avatar"
-                    >
-                    <span class="text-xl lg:text-2xl mt-3">{{ player.name }}</span>
-                    {% if player.is_host %}
-                        <span class="inline-flex items-center lg:text-lg text-neutral-300 mt-1.5">
-                            <span class="font-bold">
-                                Host
-                            </span>
-                        </span>
-                    {% endif %}
+        {% else %}
+
+            <!-- Countdown Timer -->
+            <div class="flex flex-col justify-center items-center">
+                <div class="inline-flex peer overflow-y-hidden">
+                    <span class="inline-block leading-[1em] w-[3ch] text-center h-[1em] transition-colors duration-[250ms] text-5xl lg:text-6xl 2xl:text-7xl
+                                before:relative before:transition-all before:duration-[250ms] before:text-center before:whitespace-pre before:top-[calc(var(--seconds-left)*-1em)] before:content-[var(--seconds-content)]
+                                after:fixed after:left-0 after:top-0 after:bg-neutral-300/50 after:h-0.5 after:w-full after:scale-x-[calc((var(--seconds-left)/var(--seconds-total))*100%)] after:transition-transform after:duration-[1s]"
+                          style="--seconds-left: {{ round.seconds_left }};
+                                  --seconds-total: {{ round.seconds_total }};
+                                  --seconds-content: '{% for i in range(0, round.seconds_total + 1) %}{{ "%02d"|format(i) }}\A {% endfor %}';
+                                  "
+                          _="init
+                     set seconds_left to {{ round.seconds_left }}
+                     repeat until seconds_left is 0
+                         wait 1s
+                         set seconds_left to seconds_left - 1
+                         me.style.setProperty('--seconds-left', seconds_left)">
+                    </span>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+
+            {% if round.state == 'SUBMIT_PHOTOS' %}
+                {% include 'games/partials/_submit_photos.jinja' %}
+
+            {% elif round.state == 'SHOW_TARGET' %}
+                {% include 'games/partials/_show_target.jinja' %}
+
+            {% elif round.state == 'SUBMIT_ROASTS' %}
+                {% include 'games/partials/_submit_roasts.jinja' %}
+
+            {% elif round.state == 'SHOW_ROAST' %}
+                {% include 'games/partials/_show_roast.jinja' %}
+
+            {% endif %}
+
+            <!-- Players List (Bottom) -->
+            <div class="flex flex-wrap justify-center items-end gap-6 sm:gap-8 lg:gap-10 2xl:gap-12">
+                {% for p in game.players.all() %}
+                    {% set is_current_player = (p == player) %}
+
+                    <div class="relative flex flex-col justify-end items-center starting:opacity-0 opacity-100 transition-opacity">
+                        <!-- Avatar -->
+                        <img src="{{ static('images/avatar/' ~ p.avatar ~ '.svg') }}" alt="{{ p.name }} Avatar" class="size-12 sm:size-14 lg:size-18 2xl:size-24 group-has-nth-3:size-10 sm:group-has-nth-3:size-16 2xl:group-has-nth-3:size-22 group-has-nth-6:size-8 sm:group-has-nth-6:size-14 2xl:group-has-nth-6:size-20">
+                        <!-- Player Name -->
+                        <span class="inline-flex items-center sm:text-lg mt-1.5 text-center max-w-[16ch] {{ 'font-bold' if is_current_player else 'font-thin' }}">
+                            {{ p.name }}
+                        </span>
+                        <!-- HP -->
+                        <div class="flex items-center gap-0.75 mt-1.5">
+                            {% for i in range(p.hp) %}
+                                <iconify-icon icon="game-icons:hearts" class="text-sm sm:text-base text-red-500"></iconify-icon>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
 {% endblock %}
