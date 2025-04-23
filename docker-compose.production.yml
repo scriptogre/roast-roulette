@@ -1,0 +1,28 @@
+volumes:
+  synology_media_server_roast_roulette:
+    external: true
+  db_data:
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+      args:
+        - ENVIRONMENT=production
+    volumes:
+      - synology_media_server_roast_roulette:/app/main/media
+      # Volume for sqlite3 database
+      - db_data:/app/main/data
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    command: /start
+    ports:
+        - '8002:8000'
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped

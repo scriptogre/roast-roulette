@@ -3,8 +3,9 @@ Handles HTTP requests/responses for the 'games' app. Includes logic for creating
 uploading photos, spinning the "roast roulette," and submitting clapbacks.
 """
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
+import threading
+
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -13,16 +14,17 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
+from .consumers import refresh_game
 from .models import Game
-from .models import Player
+from .models import Round
+from .services import generate_roast_pieces
 
 
 def index_view(request):
-    # Create user session if it doesn't exist
-    if not request.session.session_key:
-        request.session.create()
+    """
+    Renders the homepage where users can create or join a game.
+    """
 
-    """Renders the homepage where users can create or join a game."""
     return render(request, 'index.jinja')
 
 
@@ -30,33 +32,27 @@ def index_view(request):
 def game_create_view(request):
     """
     Handles game creation.
-
     - GET: Shows a form to enter player name and select an avatar.
     - POST: Creates a new game, adds the host player, and redirects to the game page.
     """
-    # Create user session if it doesn't exist
-    if not request.session.session_key:
-        request.session.create()
 
     if request.method == 'GET':
-        # Show form for selecting player name and avatar
+        # Render create game form
         return render(request, 'games/game_form.jinja')
-
-    else:  # request.method == 'POST':
-        # Get player name & avatar from form
+    else:
+        # Retrieve form data
         player_name = request.POST.get('player_name')
         avatar = request.POST.get('avatar')
 
-        # Create game
+        # Create new game instance
         game = Game.objects.create()
 
-        # Add this player to game
-        player = game.add_player(
-            player_name, avatar, session_id=request.session.session_key
-        )
+        # Add the host player to the game
+        player = game.add_player(player_name, avatar, request.session.session_key)
         player.is_host = True
         player.save()
 
+        # Redirect to game page
         return redirect('games:detail', game_code=game.code)
 
 
@@ -68,88 +64,150 @@ def game_join_view(request):
     - GET: Shows a form to enter player name and game code.
     - POST: Adds a player to an existing game and redirects to the game page.
     """
-    # Create user session if it doesn't exist
-    if not request.session.session_key:
-        request.session.create()
 
     if request.method == 'GET':
+        # Render join game form
         return render(request, 'games/game_form.jinja', {'is_joining': True})
 
     else:  # request.method == 'POST':
-        # Get player name & game code from form (note: <input> should have an attribute 'name="player_name"')
+        # Retrieve form data
         player_name = request.POST.get('player_name')
         avatar = request.POST.get('avatar')
         game_code = request.POST.get('game_code').upper()
 
-        # Get games by code
-        game = get_object_or_404(Game, code=game_code)
+        try:
+            # Get game instance by code
+            game = Game.objects.get(code=game_code)
+            # Add player to game
+            game.add_player(player_name, avatar, session_id=request.session.session_key)
+            # Refresh game in all connected clients
+            refresh_game(game_code)
+            # Redirect to game page
+            return redirect('games:detail', game_code=game.code)
 
-        # Add player to game
-        game.add_player(player_name, avatar, session_id=request.session.session_key)
+        except ValidationError as e:
+            # Return an error response with validation message
+            return HttpResponse(f'Failed to join game: {e}')
 
-        # Send data to all clients listening in the group "game_{game_code}"
-        async_to_sync(get_channel_layer().group_send)(
-            game_code, {'type': 'update_game'}
-        )
-
-        return redirect('games:detail', game_code=game.code)
+        except Game.DoesNotExist:
+            # Return an error response with message
+            return HttpResponse('Game not found.')
 
 
 @require_GET
 def game_detail_view(request, game_code):
-    """Displays the game lobby with details like players, rounds, and uploaded photos."""
-    # TODO: Ensure that only players in the game can access this view
+    """
+    Displays the game lobby with details like players, rounds, and uploaded photos.
+    """
 
-    # Create user session if it doesn't exist
-    if not request.session.session_key:
-        request.session.create()
-
+    # Retrieve game and current player
     game = get_object_or_404(Game, code=game_code)
+    current_player = game.players.get(session_id=request.session.session_key)
 
-    # Get player by session ID (if exists)
-    player = Player.objects.get(session_id=request.session.session_key, game=game)
+    template_name = 'games/game_detail.jinja'
 
-    return render(request, 'games/game_detail.jinja', {'game': game, 'player': player})
+    return render(
+        request,
+        template_name,
+        {
+            'game': game,
+            'round': game.current_round,
+            'player': current_player,
+        },
+    )
+
+
+@require_POST
+def game_start_view(request, game_code):
+    """
+    Handles starting the game.
+    """
+
+    # Retrieve game and current player
+    game = get_object_or_404(Game, code=game_code)
+    players = game.players.all()
+
+    # Check if player is host
+    current_player = players.get(session_id=request.session.session_key)
+    if not current_player.is_host:
+        return HttpResponse('Only the host can start the game!', status=403)
+
+    # Start game
+    round = game.start_round()
+
+    # "Photo Submission" Phase
+    # ----------------------
+    round.state = Round.State.SUBMIT_PHOTOS
+    round.save()
+    refresh_game(game_code)
+    round.wait_for_players()
+
+    # Pick a random target photo
+    target_photo = round.pick_target_photo()
+
+    # Create a container for thread results
+    thread_results = {'roast_pieces': None}
+
+    # Define the function to run in background
+    def generate_roasts_background():
+        thread_results['roast_pieces'] = generate_roast_pieces(
+            target_photo, count=players.count() * 5
+        )
+
+    # Start the background thread for roast generation
+    roast_thread = threading.Thread(target=generate_roasts_background)
+    roast_thread.start()
+
+    # Meanwhile, proceed to "Show Target" Phase
+    round.state = Round.State.SHOW_TARGET
+    round.save()
+    refresh_game(game_code)
+    round.wait_for_players()
+
+    # Wait for roast generation to complete if it hasn't already
+    roast_thread.join()
+
+    # Generate roast pieces for each player
+    roast_pieces = thread_results['roast_pieces']
+    for player in players:
+        player.add_roast_pieces([text for text in roast_pieces[:5]])
+        roast_pieces = roast_pieces[5:]
+
+    # "Submit Pieces" Phase
+    # ------------------------
+    round.state = Round.State.SUBMIT_ROASTS
+    round.save()
+    refresh_game(game_code)
+    round.wait_for_players()
+
+    # Return a success response
+    return HttpResponse(status=204)
 
 
 @require_POST
 def upload_photo_view(request, game_code):
-    """Handles photo uploads from players."""
-    # TODO: Ensure that only players in the game can upload photos
-    # TODO 2: Track for which round the photo was uploaded
+    """
+    Handles photo uploads from players.
+    """
 
-    # Ensure game code is always uppercase
-    game_code = game_code.upper()
+    # Retrieve game and current player
+    game = get_object_or_404(Game, code=game_code.upper())
+    player = game.players.get(session_id=request.session.session_key)
+    uploaded_photo_file = request.FILES.get('photo')
 
-    game = get_object_or_404(Game, code=game_code)
-    player = None
-    uploaded_photo = request.FILES.get('photo')
+    if player and uploaded_photo_file:
+        try:
+            # Add photo
+            player.add_photo(uploaded_photo_file)
 
-    if request.session.session_key:
-        player = Player.objects.get(session_id=request.session.session_key, game=game)
+            # Refresh game in all connected clients
+            refresh_game(game_code)
 
-    if player and uploaded_photo:
-        game.add_photo(player, uploaded_photo)
-        return HttpResponse('Your photo has been uploaded successfully! 🎉')
+            return HttpResponse(status=204)
 
-    return HttpResponse('Failed to upload photo. Please try again.')
+        except ValidationError as e:
+            # Return an error response with validation message
+            return HttpResponse(f'Failed to upload photo: {e}', status=400)
 
-
-def spin_roulette_view(request):
-    pass
-
-    # TODO: Implement this view
-    # 1. Get the game for which the roulette is being spun (using the game_code parameter from the URL)
-    # 2. Get all photos uploaded for that round and select one at random
-    # 3. Use OpenAI API to create an AI roast for that selected photo
-    # 4. Render the resulted roast and the selected photo
-
-
-def submit_clapback_view(request, roast_id):
-    pass
-
-    # TODO: Implement this view
-    # 1. Get the roast for which the clapback is being submitted (using the roast_id parameter from the URL)
-    # 2. Get the clapback text from the form data (from the user's POST request)
-    # 3. Save the clapback text to the roast object
-    # 4. Render the clapback text on the page
+    # Return a generic error response
+    return HttpResponse('Failed to upload photo.', status=400)

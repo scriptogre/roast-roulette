@@ -5,9 +5,17 @@ services:
       dockerfile: ./compose/django/Dockerfile
       args:
         - ENVIRONMENT=local
+    env_file:
+      - .env
     volumes:
       - .:/app:z
-      - /app/.venv/  # Exclude venv directory from mounting
+      # Exclude these volumes from the bind mount
+      - /app/.venv/
+      - /app/staticfiles/
     ports:
       - '8000:8000'
     command: /start
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped

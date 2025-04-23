@@ -9,6 +9,14 @@ from .base import env
 # ------------------------------------------------------------------------------
 DATABASES['default']['CONN_MAX_AGE'] = env.int('CONN_MAX_AGE', default=60)
 
+# CACHES
+# ------------------------------------------------------------------------------
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': env('REDIS_URL'),
+    },
+}
 
 # SECURITY
 # ------------------------------------------------------------------------------
@@ -16,7 +24,7 @@ DATABASES['default']['CONN_MAX_AGE'] = env.int('CONN_MAX_AGE', default=60)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-ssl-redirect
-SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT')
+SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT', default=False)
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-secure
 SESSION_COOKIE_SECURE = True
@@ -58,16 +66,16 @@ STORAGES = {
 
 # django-allauth
 # ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION')
+ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION', False)
 
 
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env('DJANGO_DEFAULT_FROM_EMAIL')
+# DEFAULT_FROM_EMAIL = env('DJANGO_DEFAULT_FROM_EMAIL')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+# SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-EMAIL_SUBJECT_PREFIX = env('DJANGO_EMAIL_SUBJECT_PREFIX', default='')
+# EMAIL_SUBJECT_PREFIX = env('DJANGO_EMAIL_SUBJECT_PREFIX', default='')

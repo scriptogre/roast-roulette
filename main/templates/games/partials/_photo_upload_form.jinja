@@ -1,0 +1,38 @@
+{# Photo Upload Screen #}
+
+<div class="flex-1 flex flex-col justify-center items-center">
+    <!-- Uploading -->
+    {% if not player.photo %}
+        <!-- Photo Uploader -->
+        <label id="photo-upload" tabindex="0" class="relative flex flex-col items-center justify-center rounded-3xl bg-neutral-300/2.5 hover:bg-neutral-300/5 focus:bg-neutral-300/5 border border-dashed border-neutral-300/20 w-2xs sm:w-xs lg:w-sm aspect-4/3 select-none cursor-pointer hover:border-neutral-300 focus:border-neutral-300 hover:scale-[1.02] focus:scale-[1.02] transition ease-in-out">
+            <input name="photo" type="file" class="appearance-none absolute inset-0 invisible"
+                   hx-post="{{ url('games:photo_upload', game_code=game.code) }}"
+                   hx-encoding='multipart/form-data'
+                   hx-validate="true"
+                   hx-target-4*="#form-errors"
+                   hx-on::validation:validate="event.target.files[0].size >= 10**7 && (this.setCustomValidity('Photo must be less than 10MB.') | this.reportValidity())"
+                   hx-on:click="this.setCustomValidity('')"
+                   accept="image/jpeg,image/png"
+            >
+            <iconify-icon icon="bi:image-fill" class="size-9 sm:size-10 lg:size-11 2xl:size-12" height="none"></iconify-icon>
+            <span class="text-lg lg:text-xl leading-none font-bold mt-4 sm:mt-4.5 lg:mt-5 2xl:mt-5.5">
+                Upload a photo
+            </span>
+            <span class="lg:text-lg text-neutral-400 font-light mt-2 sm:mt-2.25 lg:mt-2.5 2xl:mt-2.75">
+                Before the timer runs out!
+            </span>
+        </label>
+        <div id="form-errors" class="empty:hidden text-sm lg:text-base 2xl:text-lg text-red-500 mt-2.5 lg:mt-3 2xl:mt-3"></div>
+    {% else %}
+        <div class="flex flex-col justify-center items-center">
+            <!-- Photo -->
+            <img src="{{ player.photo.image.url }}" class="max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md max-h-[300px] rounded-3xl object-cover mx-auto starting:scale-[1.1] transition-transform ease-in-out" />
+            <span class="text-xl lg:text-2xl leading-none font-bold mt-6 lg:mt-9">
+                Your photo
+            </span>
+            <span class="lg:text-lg text-purple-neutral-500 mt-2 lg:mt-3">
+                Waiting for others...
+            </span>
+        </div>
+    {% endif %}
+</div>

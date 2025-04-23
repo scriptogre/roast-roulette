@@ -1,0 +1,56 @@
+<div class="flex-1 w-full flex flex-col items-center justify-center overflow-hidden select-none my-6">
+
+{#    <p class="text-center text-sm text-purple-neutral-300 mb-12">#}
+{#        Press the roasts you find funny.#}
+{#    </p>#}
+
+    <!-- Roast Target Photo -->
+    <img src="{{ round.roast_target_photo.image.url }}"
+         alt="Roast Target Image"
+         class="rounded-3xl object-contain w-full max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md max-h-[300px] sm:max-h-[350px] lg:max-h-[400px] 2xl:max-h-[450px] rounded-3xl object-cover"
+    />
+
+    <!-- Roasts -->
+    <form id="roast-selection-form"
+          class="max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md"
+          _="init set $current_index to 0"
+          style="--index: 0"
+    >
+
+        <div class="flex items-center w-full overflow-x-hidden overflow-y-visible py-4.5 lg:py-6">
+            {% for roast in player.roasts.all() %}
+                <label class="relative text-left min-w-[100%] max-w-[100%] transition-transform duration-150 -translate-x-[calc(var(--index)*100%)] cursor-pointer">
+                    <input type="checkbox" class="peer hidden" hx-post="{{ url('games:roast_toggle_selection', game_code=game.code, roast_id=roast.id) }}" {{ 'checked' if roast.is_selected }} />
+                    <span class="flex py-3 px-4 lg:py-4 lg:px-5 2xl:py-5 2xl:px-6 rounded-2xl border border-purple-neutral-900/50 peer-checked:border-purple-neutral-700 transition">
+                        <span class="w-full field-sizing-content overflow-hidden text-sm sm:text-base lg:text-lg 2xl:text-xl outline-none resize-none">
+                            {{- roast.text -}}
+                        </span>
+                    </span>
+                    <span class="invisible opacity-0 peer-checked:visible peer-checked:opacity-100 transition duration-[300ms] absolute -bottom-4 sm:-bottom-4.5 left-1/2 -translate-x-[6px] text-3xl">
+                        <iconify-icon icon="bi:emoji-laughing-fill" class="text-purple-neutral-100 size-4.5 sm:size-5.5" height="none"></iconify-icon>
+                    </span>
+                </label>
+            {% endfor %}
+        </div>
+
+        <!-- Roast Navigation -->
+        <div class="flex items-center justify-center 2xl:group-has-nth-3:size-22 gap-1.5 lg:gap-3">
+            <button class="flex-1 inline-grid place-items-center py-1.5 lg:py-3 cursor-pointer text-purple-neutral-500 hover:text-purple-neutral-100 hover:bg-purple-neutral-900/50 !outline-none transition-colors rounded-xl" type="button" role="button"
+                    tabindex="0"
+                    _="on click[$current_index > 0]
+                        decrement $current_index
+                        set *cssText of the closest <form/> to `--index: ${$current_index}`"
+            >
+                <iconify-icon icon="ph:arrow-left-thin" class="size-8" height="none"></iconify-icon>
+            </button>
+            <button class="flex-1 inline-grid place-items-center py-1.5 lg:py-3 cursor-pointer text-purple-neutral-500 hover:text-purple-neutral-100 hover:bg-purple-neutral-900/50 !outline-none transition-colors rounded-xl" type="button" role="button"
+                    tabindex="0"
+                    _="on click[$current_index < {{ player.roasts.count() - 1 }}]
+                        increment $current_index
+                        set *cssText of the closest <form/> to `--index: ${$current_index}`"
+            >
+                <iconify-icon icon="ph:arrow-right-thin" class="size-8" height="none"></iconify-icon>
+            </button>
+        </div>
+    </form>
+</div>

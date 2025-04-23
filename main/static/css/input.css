@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@theme {
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.5rem;
+  --text-4xl: 1.625rem;
+  --text-5xl: 1.75rem;
+  --text-6xl: 1.875rem;
+  --text-7xl: 2rem;
+  --text-8xl: 2.125rem;
+  --text-9xl: 2.25rem;
+  --text-10xl: 3rem;
+  --text-logo: 3.5rem;
+  --color-neutral-350: #BBBBBB;
+}
+
+@layer base {
+  iconify-icon {
+    @apply inline-block size-[1em]
+  }
+}
+
+@layer utilities {
+  /* For Webkit-based browsers (Chrome, Safari and Opera) */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* For IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}

@@ -1,0 +1,34 @@
+
+<div class="flex-1 w-full flex flex-col lg:flex-row items-center justify-center overflow-auto gap-6 lg:gap-14 2xl:gap-16">
+
+    <label class="flex flex-col mt-5 sm:mt-6 lg:my-7 2xl:my-8 select-none max-lg:cursor-pointer">
+        <!-- Toggle Photo -->
+        <input type="checkbox" class="peer hidden" id="toggle-photo-mobile" checked />
+
+        <!-- Label -->
+        <span class="inline-flex items-center text-lg lg:text-xl 2xl:text-2xl font-bold text-neutral-300 peer-checked:hidden lg:hidden">
+            <iconify-icon icon="ri:eye-line" class="text-pink-600 me-2"></iconify-icon>
+            Show Photo
+        </span>
+
+        <!-- Photo -->
+        <img src="{{ round.target_photo.image.url }}" alt="Roast Target Image" class="max-lg:peer-not-checked:hidden max-w-xs sm:max-w-sm lg:max-w-md 2xl:max-w-lg max-h-[256px] lg:max-h-[448px] 2xl:max-h-[576px] size-full rounded-3xl object-cover rounded-3xl starting:scale-[1.1] transition-all ease-in-out" />
+    </label>
+
+    <!-- Roasts -->
+    <div class="flex-1 flex flex-col w-full max-w-xs sm:max-w-sm lg:max-w-md 2xl:max-w-lg mb-5 sm:mb-6 lg:my-7 2xl:my-8 overflow-scroll scrollbar-hide">
+        {% for piece in player.roast_pieces.all() %}
+            <label class="flex group {{ 'mt-3 lg:mt-3.5 2xl:mt-4' if not loop.first }}">
+                <textarea name="piece" class="w-full field-sizing-content overflow-hidden lg:text-lg 2xl:text-xl py-3 px-3.25 lg:py-3.5 lg:px-3.75 2xl:py-4 2xl:px-4.25 border bg-neutral-300/2.5 group-hover:bg-neutral-300/5 border-neutral-300/10 hover:border-neutral-300/50 transition-colors rounded-xl outline-none resize-none"
+                          _="on load from body or input
+                                set my.style.height to 'auto'
+                                set my.style.height to my.scrollHeight + 'px'
+"
+                >
+                    {{- piece.text -}}
+                </textarea>
+            </label>
+        {% endfor %}
+    </div>
+
+</div>
