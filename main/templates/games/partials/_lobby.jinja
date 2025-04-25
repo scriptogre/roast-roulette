@@ -1,0 +1,76 @@
+<div class="flex flex-col items-center">
+    <div class="relative inline-flex items-center mb-2 lg:mb-3 2xl:mb-4">
+        <h1 class="text-4xl lg:text-7xl 2xl:text-9xl font-bold leading-none text-neutral-350">
+            Lobby
+        </h1>
+    </div>
+    <span class="text-lg lg:text-2xl 2xl:text-3xl leading-none font-light text-purple-neutral-500">
+        Invite your friends to join!
+    </span>
+</div>
+
+<div class="flex-1 w-full flex flex-col lg:flex-row items-center justify-center lg:justify-between">
+    <!-- QR Code / Game Code -->
+    <div class="flex-1 flex flex-col items-center justify-center mt-12">
+        <!-- QR Code -->
+        <qr-code content="{{ request.scheme~'://'~request.get_host()~url('games:detail', game_code=game.code) }}"
+                 class="size-22 sm:size-26 lg:size-30 2xl:size-34 text-neutral-200 rounded-sm overflow-hidden"
+        ></qr-code>
+        <span class="text-sm lg:text-base 2xl:text-lg font-light text-purple-neutral-500 leading-none mt-4">
+            QR Code
+        </span>
+        <!-- Game Code -->
+        <span class="relative text-neutral-200 text-[1.75rem] sm:text-[2rem] lg:text-[2.25rem] 2xl:text-[2.5rem] leading-none font-bold uppercase mt-6 lg:mt-12">
+            {{ game.code|upper }}
+        </span>
+        <span class="text-sm lg:text-base 2xl:text-lg font-light text-purple-neutral-500 leading-none mt-1.5 2xl:mt-2">
+            Game Code
+        </span>
+    </div>
+
+    <!-- Divider -->
+    <div class="h-0.5 lg:h-24 2xl:h-60 w-16 lg:w-0.5 rounded-full bg-neutral-300/2.5 mt-8 lg:mt-0 lg:mx-12"></div>
+
+    <!-- Players -->
+    <div class="flex-1 flex items-center justify-center mt-8 lg:mt-10 2xl:mt-12">
+        <div class="flex group lg:flex-wrap items-start max-h-[500px] overflow-scroll scrollbar-hide justify-center max-w-md mx-auto gap-8 lg:gap-10 2xl:gap-12 has-nth-3:gap-7 lg:has-nth-3:gap-9 2xl:has-nth-3:gap-5 has-nth-6:gap-6 lg:has-nth-6:gap-8 2xl:has-nth-6:gap-10">
+            {% for p in game.players.all() %}
+                {% set is_current_player = (p == player) %}
+                <!-- Player -->
+                <div class="relative flex flex-col justify-center items-center starting:opacity-0 transition-opacity">
+                    <!-- Avatar -->
+                    <img src="{{ static('images/avatar/' ~ p.avatar ~ '.svg') }}"
+                         class="size-14 lg:size-18 2xl:size-24 group-has-nth-3:size-12 lg:group-has-nth-3:size-16 2xl:group-has-nth-3:size-22 group-has-nth-6:size-10 lg:group-has-nth-6:size-14 2xl:group-has-nth-6:size-20"
+                         alt="{{ p.name }} Avatar"
+                    >
+                    <span class="inline-flex flex-col items-center mt-3 text-center max-w-[16ch]">
+                        <!-- Player Name -->
+                        <span class="{{ 'font-bold text-neutral-300' if is_current_player else 'text-neutral-350' }} text-lg lg:text-xl 2xl:text-2xl group-has-nth-3:text-base lg:group-has-nth-3:text-lg 2xl:group-has-nth-3:text-xl group-has-nth-6:text-sm lg:group-has-nth-6:text-base 2xl:group-has-nth-6:text-lg">
+                            {{ p.name }}
+                        </span>
+                        <!-- Status (You, Host) -->
+                        {% if is_current_player or p.is_host %}
+                            <span class="text-sm lg:text-base 2xl:text-lg group-has-nth-3:text-xs lg:group-has-nth-3:text-sm 2xl:group-has-nth-3:text-base group-has-nth-6:text-[0.675rem] lg:group-has-nth-6:text-xs 2xl:group-has-nth-6:text-sm font-light text-purple-neutral-500 whitespace-nowrap mt-[1.5px] 2xl:mt-0.5">
+                                {%- if is_current_player and p.is_host -%}
+                                    You, Host
+                                {%- elif is_current_player -%}
+                                    You
+                                {%- elif p.is_host -%}
+                                    Host
+                                {%- endif -%}
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if player.is_host %}
+    <button hx-post="{{ url('games:round_start', game_code=game.code) }}" class="text-2xl lg:text-3xl 2xl:text-4xl font-bold leading-none px-6.5 lg:px-7 lg:px-7.5 2xl:px-8 py-2.5 lg:py-2.75 2xl:py-3 mt-8 lg:mt-10 2xl:mt-12 text-[#140B1B] bg-[#EC3179] rounded-full  hover:brightness-[120%] focus:brightness-[120%] hover:scale-[1.05] focus:scale-[1.05] active:scale-[1.1] outline-0 transition cursor-pointer"
+            type="button" role="button" tabindex="0"
+    >
+        <span class="block translate-y-px">Start</span>
+    </button>
+{% endif %}

@@ -1,0 +1,20 @@
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+      args:
+        - ENVIRONMENT=local
+    env_file:
+      - .env
+    volumes:
+      - .:/app:rw
+      # Exclude from bind mount
+      - /app/.venv/
+    ports:
+      - '8000:8000'
+    command: /start
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped

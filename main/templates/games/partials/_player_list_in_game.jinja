@@ -1,0 +1,36 @@
+<label class="peer group fixed top-full max-h-[90%] px-6 py-5 lg:max-h-[50%] max-w-2xs sm:max-w-xs size-full flex flex-col mx-auto z-10 border border-purple-neutral-900/50 bg-[#130A1A] rounded-t-3xl -translate-y-14 has-checked:-translate-y-full transition duration-200 cursor-pointer outline-0 select-none">
+    <!-- Menu Toggle -->
+    <input type="checkbox" class="peer hidden" id="players-menu-toggle" hx-preserve="true">
+    <!-- Menu Snippet -->
+    <span class="group flex items-center justify-between">
+        <span class="flex items-center text-xs sm:text-sm">
+            <iconify-icon icon="fa-solid:users"></iconify-icon>
+            <span class="ms-3">Players ({{ game.players.count() }})</span>
+        </span>
+        <span class="flex group-peer-checked:hidden gap-1">
+            {% for p in game.players.order_by('-created_at')[:5] %}
+                <!-- Small Avatar -->
+                <img src="{{ static('images/avatar/' ~ p.avatar ~ '.svg') }}" alt="{{ p.name }} Avatar" class="size-4">
+            {% endfor %}
+        </span>
+    </span>
+    <span class="flex-1 flex flex-col max-h-[calc(100%-3rem)] overflow-scroll scrollbar-hide mt-6">
+        {% for p in game.players.all() %}
+            {% set is_current_player = (p == player) %}
+            <div class="flex items-center not-first:mt-6">
+                <!-- Avatar -->
+                <img src="{{ static('images/avatar/' ~ p.avatar ~ '.svg') }}" alt="{{ p.name }} Avatar" class="size-6">
+                <!-- Player Name -->
+                <span class="text-sm sm:text-base truncate ms-2">
+                    {{ p.name }}
+                </span>
+                {# Optionally add (You) indicator if needed #}
+                {% if is_current_player %}
+                    <span class="text-xs text-purple-neutral-500 ml-2">(You)</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </span>
+</label>
+{# Backdrop (Mobile) #}
+<label for="players-menu-toggle" class="lg:hidden fixed inset-0 backdrop-blur-xs invisible opacity-0 peer-has-checked:visible peer-has-checked:opacity-100 transition-opacity"></label>

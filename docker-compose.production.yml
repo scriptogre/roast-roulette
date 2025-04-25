@@ -1,0 +1,28 @@
+volumes:
+  sqlite:          # Named volume for SQLite database
+  staticfiles:     # Named volume for static files
+  media:           # Named volume for media files (uploads)
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+      args:
+        - ENVIRONMENT=production
+    volumes:
+      - sqlite:/app/data/:rw
+      - staticfiles:/app/staticfiles/:rw
+      - media:/app/media/:rw
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    command: /start
+    ports:
+      - '${PORT}:8000'
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped

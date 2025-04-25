@@ -1,0 +1,22 @@
+{
+  "short_name": "Roast R.",
+  "name": "Roast Roulette",
+  "description": "Get roasted by an AI, but try not to cry.",
+  "icons": [
+    {
+      "src": "/static/images/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/images/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#130A1B",
+  "background_color": "#130A1B",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
