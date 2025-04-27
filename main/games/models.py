@@ -3,18 +3,16 @@ Defines the database models for the 'games' app. These models represent the data
 for game sessions, players, uploaded photos, and roasts.
 """
 import base64
-import time
 
-import shortuuid
 from django.core.exceptions import ValidationError
-from django.core.validators import FileExtensionValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count
 from django.utils import timezone
 
-from main.games.enums import GameRoundState, GameState, HeatLevel
+from main.games.enums import GameRoundStage, GameState
+from main.games.utils import generate_unique_game_code
 
 
 class BaseModel(models.Model):
@@ -38,15 +36,6 @@ class BaseModel(models.Model):
         super().save(*args, **kwargs)
 
 
-def generate_unique_code():
-    """
-    Generates a short, unique 4-character code using uppercase letters and numbers.
-    """
-    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    su = shortuuid.ShortUUID(alphabet=alphabet)
-    return su.random(length=4)
-
-
 class Game(BaseModel):
     """
     Represents a game session.
@@ -61,138 +50,60 @@ class Game(BaseModel):
     code = models.CharField(
         max_length=4,
         unique=True,
-        default=generate_unique_code,
+        default=generate_unique_game_code,
         help_text='A unique 4-character game code for players to join.',
     )
 
     @property
-    def number_of_rounds(self):
-        return self.rounds.all().count()
-
-    @property
-    def round(self):
-        return self.rounds.order_by('-count').first()
-
-    @property
     def is_in_lobby(self):
-        """Returns True if the game is in the lobby stage (round 0)."""
         return self.state == GameState.WAITING_FOR_PLAYERS
 
     @property
     def is_in_progress(self):
-        """Returns True if the game is in progress (round > 0)."""
         return self.state == GameState.IN_PROGRESS
-
-    def start_next_round(self) -> 'GameRound':
-        """Creates a new round for this game."""
-        return GameRound.objects.create(count=self.number_of_rounds + 1, game=self)
-
-    def add_player(self, name, avatar, session_id) -> 'Player':
-        """Creates a new player for this game."""
-        return Player.objects.create(
-            game=self, name=name, avatar=avatar, session_id=session_id
-        )
 
 
 class GameRound(BaseModel):
     """
     Represents a round in a game.
     """
-
-    TIME_OFFSET = 2
     TIME_LIMITS = {
-        GameRoundState.UPLOAD_PHOTO: 20 + TIME_OFFSET,
-        GameRoundState.CHOOSE_ROAST_TARGET: 5 + TIME_OFFSET,
-        GameRoundState.VOTE_ROAST_IDEAS: 60 + TIME_OFFSET,
-        GameRoundState.SHOW_MOST_VOTED_IDEAS: 20 + TIME_OFFSET,
+        GameRoundStage.UPLOAD_PHOTO: 60,
+        GameRoundStage.WAIT_FOR_ROULETTE: 10,
+        GameRoundStage.VOTE_ROASTS: 60,
+        GameRoundStage.SHOW_RESULTS: 60,
     }
 
     count = models.IntegerField(help_text='The game round number (1, 2, 3, etc.)')
-    state = models.CharField(
+    stage = models.CharField(
         max_length=26,
-        choices=GameRoundState.choices,
-        default=GameRoundState.UPLOAD_PHOTO,
-        help_text='Current state of this round.',
+        choices=GameRoundStage.choices,
+        default=GameRoundStage.UPLOAD_PHOTO,
+        help_text='Current stage of this round.',
     )
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='rounds')
 
     class Meta:
         unique_together = ['game', 'count']
 
-    def clean(self):
-        """
-        Validates the game round instance before saving it to the database.
-        """
-        super().clean()
-
-        if self.state == GameRoundState.CHOOSE_ROAST_TARGET:
-            if not self.game.players.filter(photos__game_round=self).exists():
-                msg = f'At least one player must upload a photo before proceeding to {self.state}.'
-                raise ValidationError(msg)
+    @property
+    def stage_seconds_total(self) -> int:
+        return self.TIME_LIMITS.get(self.stage, 0)
 
     @property
-    def seconds_left(self):
-        """Calculate seconds left using the updated_at field."""
-        time_limit = self.TIME_LIMITS[self.state]
+    def stage_seconds_left(self):
         elapsed_time = timezone.now() - self.updated_at
-        return max(0, time_limit - elapsed_time.seconds)
+        return max(0, self.stage_seconds_total - elapsed_time.seconds)
 
     @property
-    def seconds_total(self):
-        return self.TIME_LIMITS[self.state]
+    def is_finished(self):
+        return self.stage == GameRoundStage.SHOW_RESULTS
 
-    @property
-    def roast_target_photo(self):
-        return self.photos.filter(is_roast_target=True).first()
-
-    def choose_roast_target(self) -> 'Photo':
-        """Selects a random photo from the uploaded photos."""
-        photos = self.photos.all()
-
-        photo = photos.order_by('?').first()
-        photo.is_roast_target = True
-        photo.save()
-
-        return photo
-
-    def add_roast_idea(self, text: str) -> 'RoastIdea':
-        return RoastIdea.objects.create(
-            game_round=self,
-            text=text,
-        )
-
-    def add_roast_idea_vote(self, player: 'Player', roast_idea: 'RoastIdea') -> 'RoastIdeaVote':
-        return RoastIdeaVote.objects.create(
-            game_round=self,
-            player=player,
-            roast_idea=roast_idea,
-        )
-
-    def add_roast_poem(self, text: str) -> 'RoastPoem':
-        """Creates the roast poem for this game round."""
-        return RoastPoem.objects.create(
-            game_round=self,
-            photo=self.roast_target_photo,
-            text=text,
-        )
-
-    def add_photo_for(self, player, cache_key):
-        return Photo.objects.create(
-            game_round=self, cache_key=cache_key, player=player
-        )
-
-    def photo_for(self, player: 'Player') -> 'Photo | None':
-        """Returns the photo uploaded by the player for this round, if any."""
-        return self.photos.filter(player=player).first()
-
-    def get_most_voted_ideas(self):
-        """Returns the top 10 roast ideas based on votes."""
-        return self.roast_ideas.annotate(
-            num_votes=Count('votes_received')
-        ).order_by('-num_votes')[:5]
-
-    def wait_for_players(self):
-        time.sleep(self.TIME_LIMITS[self.state])
+    def get_top_roasts(self):
+        """Returns the top 5 roasts based on votes."""
+        return self.roasts.annotate(
+            vote_count=Count('votes_received')
+        ).order_by('-vote_count')[:5]
 
 
 class Player(BaseModel):
@@ -200,9 +111,9 @@ class Player(BaseModel):
     Represents a player in a game.
     """
 
-    session_id = models.CharField(
+    session_key = models.CharField(
         max_length=32,
-        help_text="Unique ID to track the player's browser session.",
+        help_text="Unique key to track the player's browser session.",
     )
     name = models.CharField(
         max_length=32,
@@ -227,7 +138,7 @@ class Player(BaseModel):
     )
 
     class Meta:
-        unique_together = ['game', 'session_id']
+        unique_together = ['game', 'session_key']
 
     def clean(self, *args, **kwargs):
         super().clean()
@@ -255,7 +166,7 @@ class Photo(BaseModel):
         help_text='The game round this photo belongs to.',
         related_name='photos',
     )
-    player = models.ForeignKey(
+    uploaded_by = models.ForeignKey(
         Player,
         on_delete=models.CASCADE,
         help_text='The player who uploaded the photo.',
@@ -274,7 +185,7 @@ class Photo(BaseModel):
     )
 
     class Meta:
-        unique_together = ['game_round', 'player']
+        unique_together = ['game_round', 'uploaded_by']
 
     @property
     def base64_url(self):
@@ -291,87 +202,44 @@ class Photo(BaseModel):
         return f'data:{content_type};base64,{base64_image}' if binary_image else ""
 
 
-class RoastIdea(BaseModel):
+class Roast(BaseModel):
     """
-    Represents an idea of a roast generated by an LLM.
+    Represents a roast generated by an LLM.
     """
 
     text = models.TextField(
         null=True,
         blank=True,
-        help_text='The text of the roast contribution.',
-    )
-    roast_poem = models.ForeignKey(
-        'RoastPoem',
-        on_delete=models.CASCADE,
-        related_name='roast_ideas',
-        help_text='The roast poem this contribution belongs to.',
-        null=True,
-        blank=True,
+        help_text='The text of the roast.',
     )
     game_round = models.ForeignKey(
         GameRound,
         on_delete=models.CASCADE,
         help_text='The round this roast contribution belongs to.',
-        related_name='roast_ideas',
+        related_name='roasts',
     )
 
-    # Add a property to easily get the vote count
     @property
-    def vote_count(self):
-        # Access the related RoastIdeaVote objects via the 'votes_received' related_name
-        return self.votes_received.count()
+    async def vote_count(self):
+        return await self.votes_received.acount()
 
-    def has_player_voted(self, player: Player) -> bool:
+    def is_already_voted_by(self, player: Player) -> bool:
         return self.votes_received.filter(player=player).exists()
 
 
-class RoastIdeaVote(models.Model):
-    """
-    Represents a single vote by a Player for a RoastIdea.
-    Ensures a player can only vote once per idea.
-    """
-    player = models.ForeignKey(
+class Vote(models.Model):
+    roast = models.ForeignKey(
+        Roast,
+        on_delete=models.CASCADE,
+        related_name='votes_received',
+        help_text='The roast receiving the vote.'
+    )
+    submitted_by = models.ForeignKey(
         Player,
         on_delete=models.CASCADE,
-        related_name='votes_cast',
-        help_text='The player who cast this vote.'
-    )
-    roast_idea = models.ForeignKey(
-        RoastIdea,
-        on_delete=models.CASCADE,
-        related_name='votes_received',  # Changed from 'votes' to avoid conflict
-        help_text='The roast idea being voted for.'
-    )
-    game_round = models.ForeignKey(
-        GameRound,
-        on_delete=models.CASCADE,
-        help_text='The round in which the vote was cast.',
-        related_name='votes'    # Optional, but can be useful
+        related_name='votes_submitted',
+        help_text='The player who submitted this vote.'
     )
 
     class Meta:
-        unique_together = ('player', 'roast_idea')
-
-
-class RoastPoem(BaseModel):
-    """
-    Represents the roast poem generated from player contributions.
-    """
-
-    text = models.TextField(
-        null=True,
-        blank=True,
-        help_text='The final text of the completed roast.',
-    )
-    game_round = models.OneToOneField(
-        GameRound,
-        on_delete=models.CASCADE,
-        help_text='The game round this roast belongs to.',
-        related_name='roast_poem',
-    )
-    photo = models.ForeignKey(
-        Photo,
-        on_delete=models.CASCADE,
-        help_text='The photo being roasted.',
-    )
+        unique_together = ('roast', 'submitted_by')

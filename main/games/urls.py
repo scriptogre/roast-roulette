@@ -5,9 +5,22 @@ URL configuration for the 'games' app. Maps URLs to views for game-related actio
 from django.urls import path
 from django.urls import register_converter
 
-from main.games.converters import UppercaseGameCodeConverter
-
 from . import views
+
+
+class UppercaseGameCodeConverter:
+    """
+    Custom converter for game codes that ensures they are always uppercase.
+    """
+
+    regex = '[A-Za-z]{4}'  # Matches 4 letters (assuming game codes are 4 characters)
+
+    def to_python(self, value):
+        return value.upper()  # Convert to uppercase before passing to view
+
+    def to_url(self, value):
+        return value.upper()  # Ensure the URL generated is uppercase
+
 
 register_converter(UppercaseGameCodeConverter, 'game_code')
 
@@ -34,8 +47,13 @@ urlpatterns = [
         name='photo_upload',
     ),
     path(
-        '<game_code:game_code>/roasts/<str:roast_idea_id>/toggle-vote/',
-        views.roast_idea_toggle_vote_view,
-        name='roast_idea_toggle_vote',
+        '<game_code:game_code>/roasts/<str:roast_id>/votes/',
+        views.vote_create_view,
+        name='vote_create',
     ),
+    path(
+        '<game_code:game_code>/roasts/<str:roast_id>/votes/<str:vote_id>/delete',
+        views.vote_delete_view,
+        name='vote_delete',
+    )
 ]

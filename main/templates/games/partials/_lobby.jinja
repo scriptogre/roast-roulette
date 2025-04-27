@@ -12,14 +12,12 @@
 <div class="flex-1 w-full flex flex-col lg:flex-row items-center justify-center lg:justify-between">
     <!-- QR Code / Game Code -->
     <div class="flex-1 flex flex-col items-center justify-center mt-12">
-        <!-- QR Code -->
         <qr-code content="{{ request.scheme~'://'~request.get_host()~url('games:detail', game_code=game.code) }}"
                  class="size-22 sm:size-26 lg:size-30 2xl:size-34 text-neutral-200 rounded-sm overflow-hidden"
         ></qr-code>
         <span class="text-sm lg:text-base 2xl:text-lg font-light text-purple-neutral-500 leading-none mt-4">
             QR Code
         </span>
-        <!-- Game Code -->
         <span class="relative text-neutral-200 text-[1.75rem] sm:text-[2rem] lg:text-[2.25rem] 2xl:text-[2.5rem] leading-none font-bold uppercase mt-6 lg:mt-12">
             {{ game.code|upper }}
         </span>
@@ -34,8 +32,8 @@
     <!-- Players -->
     <div class="flex-1 flex items-center justify-center mt-8 lg:mt-10 2xl:mt-12">
         <div class="flex group lg:flex-wrap items-start max-h-[500px] overflow-scroll scrollbar-hide justify-center max-w-md mx-auto gap-8 lg:gap-10 2xl:gap-12 has-nth-3:gap-7 lg:has-nth-3:gap-9 2xl:has-nth-3:gap-5 has-nth-6:gap-6 lg:has-nth-6:gap-8 2xl:has-nth-6:gap-10">
-            {% for p in game.players.all() %}
-                {% set is_current_player = (p == player) %}
+            {% for p in players %}
+                {% set is_current_player = (p == current_player) %}
                 <!-- Player -->
                 <div class="relative flex flex-col justify-center items-center starting:opacity-0 transition-opacity">
                     <!-- Avatar -->
@@ -49,13 +47,13 @@
                             {{ p.name }}
                         </span>
                         <!-- Status (You, Host) -->
-                        {% if is_current_player or p.is_host %}
+                        {% if is_current_player or current_player.is_host %}
                             <span class="text-sm lg:text-base 2xl:text-lg group-has-nth-3:text-xs lg:group-has-nth-3:text-sm 2xl:group-has-nth-3:text-base group-has-nth-6:text-[0.675rem] lg:group-has-nth-6:text-xs 2xl:group-has-nth-6:text-sm font-light text-purple-neutral-500 whitespace-nowrap mt-[1.5px] 2xl:mt-0.5">
-                                {%- if is_current_player and p.is_host -%}
+                                {%- if is_current_player and current_player.is_host -%}
                                     You, Host
                                 {%- elif is_current_player -%}
                                     You
-                                {%- elif p.is_host -%}
+                                {%- elif current_player.is_host -%}
                                     Host
                                 {%- endif -%}
                             </span>
@@ -67,7 +65,7 @@
     </div>
 </div>
 
-{% if player.is_host %}
+{% if current_player.is_host %}
     <button hx-post="{{ url('games:round_start', game_code=game.code) }}" class="text-2xl lg:text-3xl 2xl:text-4xl font-bold leading-none px-6.5 lg:px-7 lg:px-7.5 2xl:px-8 py-2.5 lg:py-2.75 2xl:py-3 mt-8 lg:mt-10 2xl:mt-12 text-[#140B1B] bg-[#EC3179] rounded-full  hover:brightness-[120%] focus:brightness-[120%] hover:scale-[1.05] focus:scale-[1.05] active:scale-[1.1] outline-0 transition cursor-pointer"
             type="button" role="button" tabindex="0"
     >

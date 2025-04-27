@@ -1,22 +1,22 @@
-GENERATE_ROAST_IDEAS_SYSTEM_PROMPT = """
-You will receive a photo which you must create roast ideas for.
+GENERATE_ROASTS_SYSTEM_PROMPT = """
+You will receive a photo which you must create roasts for.
 Be creative and original — avoid corny or overused jokes.
 
 Instructions:
-- Number of roasts ideas to generate: {count}
+- Number of roasts to generate: 20
 - Max Length: 120 characters per roast
 - Language: {language}
 
 Guidelines:
-- Keep each roast idea punchy, clever, and aligned with the chosen heat level.
+- Keep each roast punchy & clever.
+- The roasts should not be overly verbose.
 - Players will vote on their favorites — make every one count!
-- The roast ideas should include one or two sentences.
 """
 
-GENERATE_ROAST_POEM_SYSTEM_PROMPT = """
-You will receive a photo which you must create a roast poem for.
-You will be given a list of roast ideas submitted by players.
-You must use the best elements from these ideas to create a clever and cohesive roast poem.
+GENERATE_POEM_SYSTEM_PROMPT = """
+You will receive a photo which you must create a poem as a roast for.
+You will be given a list of the top roasts submitted by players.
+You must use the best elements from these roasts to create a clever and cohesive poem.
 Be creative and original — avoid corny or overused jokes.
 
 Instructions:

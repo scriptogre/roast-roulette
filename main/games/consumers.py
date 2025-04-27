@@ -5,18 +5,11 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
 
 
-async def atrigger_clients_refresh(game_code):
+async def trigger_clients_refresh(game_code):
     """
     Sends a message to the game group to refresh the game state.
     """
     await get_channel_layer().group_send(game_code, {'type': 'refresh_game'})
-
-
-def trigger_clients_refresh(game_code):
-    """
-    Sends a message to the game group to refresh the game state.
-    """
-    async_to_sync(atrigger_clients_refresh)(game_code)
 
 
 class GameConsumer(AsyncWebsocketConsumer):

@@ -18,7 +18,7 @@
                     {% if idea.votes_received.count() > 0 %}
                         <span>•</span>
                     {% endif %}
-                    <span class="whitespace-nowrap">{{ idea.vote_count }} votes</span>
+                    <span class="whitespace-nowrap">{{ idea.votes_received.count() }} votes</span>
                 </span>
             </div>
         {% endfor %}

@@ -1,8 +1,6 @@
-{% set photo = game.round.photo_for(player) %}
-
 <div class="flex-1 flex flex-col justify-center items-center my-6">
     <!-- Uploading -->
-    {% if not photo %}
+    {% if not current_player_photo %}
         <!-- Photo Uploader -->
         <label id="photo-upload"
                tabindex="0"
@@ -32,7 +30,7 @@
                 <span>Press to zoom in/out</span>
             </span>
             <!-- Photo -->
-            <img src="{{ photo.base64_url }}"
+            <img src="{{ current_player_photo.base64_url }}"
                  class="max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md max-h-[300px] rounded-3xl object-cover mx-auto starting:scale-[1.1] transition-all ease-in-out lg:focus:scale-[2.5] lg:z-10 lg:cursor-pointer outline-0 select-none"
                  tabindex="0"
                  draggable="false"
@@ -40,7 +38,7 @@
                  hx-on:mousedown="document.activeElement == this && (event.preventDefault() || this.blur())"
             />
             <label class="relative flex items-center group rounded-full lg:text-lg 2xl:text-xl leading-none max-w-[14rem] lg:max-w-3xs 2xl:max-w-2xs w-full px-3.75 lg:px-4 2xl:px-4.5 py-2.75 lg:py-3 2xl:py-3.25 mt-6 lg:mt-6 bg-purple-neutral-900/25 border border-transparent hover:border-purple-neutral-300 has-focus:border-pink-500/50 transition">
-                <iconify-icon icon="uil:question" class="me-2.5 lg:me-3 2xl:me-3.5 text-purple-neutral-300 group-has-focus:text-pink-500 -translate-y-px transition scale-[1.5]"></iconify-icon>
+                <iconify-icon icon="gridicons:caption" class="me-2.5 lg:me-3 2xl:me-3.5 text-purple-neutral-300 group-has-focus:text-pink-500 -translate-y-px transition"></iconify-icon>
                 <input hx-post="{{ url('games:photo_caption_submit', game_code=game.code) }}"
                        hx-trigger="input changed delay:300ms, keyup[key=='Enter']"
                        _="on htmx:afterRequest
@@ -52,7 +50,7 @@
                        type="text"
                        name="caption"
                        placeholder="Add caption for photo"
-                       value="{{ photo.caption or '' }}"
+                       value="{{ current_player_photo.caption or '' }}"
                        maxlength="100"
                        autofocus
                 />

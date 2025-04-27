@@ -23,16 +23,16 @@
     <link href="{{ static('css/output.css') }}" rel="stylesheet">
 
     <!-- HTMX (https://htmx.org/) -->
-    <script defer src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script defer src="{{ static('js/htmx.min.js') }}"></script>
     <!-- WebSockets Extension (https://htmx.org/extensions/ws/) -->
-    <script defer src="https://unpkg.com/htmx-ext-ws@2.0.2"></script>
+    <script defer src="{{ static('js/ws.js') }}"></script>
     <!-- Response Targets Extension (https://htmx.org/extensions/response-targets/) -->
-    <script defer src="https://unpkg.com/htmx-ext-response-targets@2.0.2"></script>
+    <script defer src="{{ static('js/response-targets.js') }}"></script>
     <!-- Django-HTMX Extension Script (https://django-htmx.readthedocs.io/en/latest/extension_script.html) -->
     {{ django_htmx_script() }}
 
     <!-- Hyperscript (https://hyperscript.org/) -->
-    <script defer src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+    <script defer src="{{ static('js/hyperscript.min.js') }}"></script>
 
     <!-- <qr-code> Web Component (https://github.com/bitjson/qr-code) -->
     <script defer src="{{ static('js/qr-code.js')}}"></script>
@@ -45,7 +45,7 @@
       hx-boost="true"
 >
 
-<main class="h-dvh overflow-hidden absolute inset-0 p-4 lg:p-8 flex-1 flex flex-col items-center w-full max-w-7xl mx-auto starting:opacity-0 starting:scale-[1.02] transition">
+<main class="h-dvh overflow-hidden absolute inset-0 p-4 lg:p-8 flex-1 flex flex-col items-center w-full mx-auto starting:opacity-0 starting:scale-[1.02] transition">
     {% block content %}
         {# Content from child templates will be inserted here #}
     {% endblock %}

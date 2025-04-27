@@ -5,7 +5,7 @@ from pathlib import Path
 
 import environs
 
-from main.games.enums import GameRoundState, GameState, HeatLevel
+from main.games.enums import GameRoundStage, GameState
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / 'main'
@@ -177,9 +177,8 @@ TEMPLATES = [
             'context_processors': [],
             'globals': {
                 'django_htmx_script': 'django_htmx.jinja.django_htmx_script',
-                'GameRoundState': GameRoundState,
+                'GameRoundStage': GameRoundStage,
                 'GameState': GameState,
-                'HeatLevel': HeatLevel,
             },
         },
     },

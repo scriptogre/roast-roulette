@@ -9,37 +9,19 @@
          hx-get="{{ url('games:detail', game_code=game.code) }}"
          hx-target="body"
     >
-        {% if game.state == GameState.WAITING_FOR_PLAYERS %}
+        {% if game.is_in_lobby %}
 
             {% include 'games/partials/_lobby.jinja' %}
 
-        {% elif game.state == GameState.IN_PROGRESS %}
+        {% else %}
 
-            <div class="flex flex-col justify-center items-center">
-                {% if game.round.state not in GameRoundState.SHOW_ROAST_POEM %}
-                    <!-- Countdown Timer -->
-                    {% include 'games/partials/_countdown_timer.jinja' %}
-                {% endif %}
+            {% include 'games/partials/_stage_header.jinja' %}
 
-                <!-- Game Round Instructions -->
-                <span class="text-lg lg:text-2xl 2xl:text-3xl leading-none font-light text-purple-neutral-500 mt-3 lg:mt-4.5">
-                    {{ GameRoundState(game.round.state).instructions }}
-                </span>
-            </div>
+            {# Dynamically include partial based on current round stage #}
+            {% set stage_number = (GameRoundStage|list).index(game_round.stage) + 1 %}
+            {% set stage_slug = '_'.join(game_round.stage.lower().split()) %}
+            {% include 'games/partials/_stage_'~stage_number~'_'~stage_slug~'.jinja' %}
 
-            {% if game.round.state == GameRoundState.UPLOAD_PHOTO %}
-                {% include 'games/partials/_round_state_1_upload_photo.jinja' %}
-            {% elif game.round.state == GameRoundState.CHOOSE_ROAST_TARGET %}
-                {% include 'games/partials/_round_state_2_choose_roast_target.jinja' %}
-            {% elif game.round.state == GameRoundState.VOTE_ROAST_IDEAS %}
-                {% include 'games/partials/_round_state_3_vote_roast_ideas.jinja' %}
-            {% elif game.round.state == GameRoundState.SHOW_MOST_VOTED_IDEAS %}
-                {% include 'games/partials/_round_state_4_show_most_voted_ideas.jinja' %}
-            {% elif game.round.state == GameRoundState.SHOW_ROAST_POEM %}
-                {% include 'games/partials/_round_state_5_show_roast_poem.jinja' %}
-            {% endif %}
-
-            <!-- Player List -->
             {% include 'games/partials/_player_list_in_game.jinja' %}
 
         {% endif %}
