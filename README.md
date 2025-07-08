@@ -1,8 +1,8 @@
 # Roast Roulette 🔥🎲
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/ded4ae9b-36b8-4643-ad82-26622c93756d" />
-
 A multiplayer party game where AI roasts players' photos.
+
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/ded4ae9b-36b8-4643-ad82-26622c93756d" />
 
 ## Quick Start
 
