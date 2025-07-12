@@ -1,0 +1,160 @@
+<a href="{{ url_for('get_index') }}" preload class="group fixed top-8 lg:top-12 left-8 lg:left-12 flex items-center transition hover:scale-[1.1] active:scale-[1.2] active:duration-150 p-2 sm:p-0">
+    <iconify-icon id="back-arrow-{{ game.code }}" icon="fa6-solid:arrow-left" class="text-primary size-4 sm:size-4.5 lg:size-5 xl:size-5.5 2xl:size-6 sm:me-2.5" height="none"></iconify-icon>
+    <span class="text-sm sm:text-base lg:text-lg xl:text-xl 2xl:text-2xl translate-y-px hidden sm:inline">
+        Back
+    </span>
+</a>
+
+<!-- Mobile: height-constrained, Desktop: original layout -->
+<div class="h-full flex flex-col lg:contents">
+    <div class="flex-shrink-0 lg:flex lg:flex-col lg:items-center flex flex-col items-center mb-8 lg:mb-6">
+        <h1 class="text-[1.25rem] sm:text-[1.75rem] lg:text-[2rem] xl:text-[2.25rem] 2xl:text-[2.5rem] font-semibold leading-none text-purple-neutral-200 mb-3 lg:mb-4">
+            Lobby
+        </h1>
+        <span class="sm:text-lg lg:text-xl xl:text-[1.375rem] 2xl:text-[1.5rem] leading-none font-light text-purple-neutral-400">
+            Invite your friends to join!
+        </span>
+    </div>
+
+    <div class="flex-1 w-full flex flex-col lg:flex-row items-center justify-center lg:justify-between min-h-0">
+        <!-- QR Code / Game Code -->
+        <div class="flex-shrink-0 lg:flex-1 flex flex-col items-center justify-center lg:mt-12">
+            <qr-code id="qr-code-{{ game.code }}"
+                     content="{{ url_for('get_game', game_code=game.code) }}"
+                     class="size-20 sm:size-24 lg:size-28 xl:size-32 2xl:size-36 text-purple-neutral-200 rounded-sm overflow-hidden"
+            ></qr-code>
+            <span class="text-xs sm:text-sm lg:text-base xl:text-lg 2xl:text-xl font-light text-purple-neutral-400 leading-none mt-4 lg:mt-6">
+                QR Code
+            </span>
+            <span class="relative text-purple-neutral-200 text-3xl sm:text-4xl lg:text-[2.5rem] xl:text-[2.75rem] 2xl:text-5xl leading-none font-extrabold uppercase mt-6 lg:mt-8 xl:mt-10 2xl:mt-12">
+                {{ game.code|upper }}
+            </span>
+            <span class="text-xs sm:text-sm lg:text-base xl:text-lg 2xl:text-xl font-light text-purple-neutral-400 leading-none mt-3 lg:mt-4">
+                Game Code
+            </span>
+        </div>
+
+        <!-- Divider -->
+        <div class="h-0.5 lg:h-24 2xl:h-60 w-16 lg:w-0.5 rounded-full bg-purple-neutral-300/2.5 my-4 lg:my-0 lg:mx-12 flex-shrink-0"></div>
+
+        <!-- Players -->
+        <div class="flex-1 flex flex-col items-center justify-center min-h-0 mt-6 sm:mt-8 lg:mt-10 xl:mt-12 2xl:mt-16">
+
+            <!-- Player Count -->
+            <div class="flex-shrink-0 flex items-center text-purple-neutral-200 gap-1 sm:gap-1.5 lg:gap-2 xl:gap-2.5 2xl:gap-3 mb-2 sm:mb-2.5 lg:mb-3 xl:mb-4 2xl:mb-5">
+                <iconify-icon id="users-icon-{{ game.code }}" icon="solar:users-group-rounded-bold" class="size-3 sm:size-3.75 lg:size-4.5 xl:size-5.25 2xl:size-6" height="none"></iconify-icon>
+                <span class="text-xs sm:text-sm lg:text-base xl:text-lg 2xl:text-xl font-medium">
+                    {{ active_players|length }} player{{ 's' if active_players|length != 1 else '' }}
+                </span>
+            </div>
+
+            <!-- Divider -->
+            <div class="w-4 sm:w-8 lg:w-12 h-px bg-purple-neutral-300/2.5 mb-2 sm:mb-2.5 lg:mb-3 xl:mb-4 2xl:mb-5"></div>
+
+            <!-- Players Grid -->
+            <div class="flex-1 w-full p-6 lg:w-full lg:max-w-2xl overflow-y-auto min-h-0 lg:max-h-[60vh]">
+                <div class="group grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2 sm:gap-3 lg:gap-3 justify-items-center">
+                    {% for p in game.connected_players %}
+                            {% set is_current_player = (p == player) %}
+                            {% set is_host = (p == game.host) %}
+
+                        <div class="flex flex-col justify-center items-center p-1.5 lg:p-2 w-full max-w-[140px] {{ 'relative rounded-2xl border border-primary/50 bg-primary/5' if is_current_player and not is_host }}{{ 'relative rounded-2xl border border-amber-500/50 bg-amber-500/5' if is_host }}">
+
+                            {% if is_host %}
+                                <span class="absolute -top-5 sm:-top-6 lg:-top-7 left-1/2 -translate-x-1/2 text-xs sm:text-sm lg:text-base font-semibold text-center text-amber-500 brightness-110 flex items-center gap-1 sm:gap-1.5 whitespace-nowrap">
+                                    <iconify-icon id="crown-icon-{{ game.code }}-{{ p.id }}" icon="ph:crown-fill" class="text-amber-500 size-3 sm:size-3.5 lg:size-4 -translate-y-[0.5px] sm:-translate-y-px" height="none"></iconify-icon>
+                                    {% if is_current_player %}
+                                        You, Host
+                                    {% else %}
+                                        Host
+                                    {% endif %}
+                                </span>
+                            {% elif is_current_player %}
+                                <span class="absolute -top-5 sm:-top-6 lg:-top-7 left-1/2 -translate-x-1/2 text-xs sm:text-sm lg:text-base font-semibold text-center text-primary brightness-110">You</span>
+                            {% endif %}
+
+                            <div class="rounded-full overflow-hidden size-12 sm:size-14 lg:size-16 group-has-nth-4:size-10 sm:group-has-nth-4:size-12 lg:group-has-nth-4:size-14 group-has-nth-12:!size-8 sm:group-has-nth-12:!size-10 lg:group-has-nth-12:!size-12">
+                                <img src="{{ url_for('static', path='images/avatars/avatar-'~p.avatar~'.png') }}" alt="Avatar {{ p.avatar }}" class="w-full h-full object-cover">
+                            </div>
+
+                            <div class="mt-2 lg:mt-3 group-has-nth-4:mt-1.5 lg:group-has-nth-4:mt-2 group-has-nth-12:!mt-1 lg:group-has-nth-12:!mt-1.5 text-center">
+
+                                <div class="text-purple-neutral-200 text-[1rem] sm:text-[1.125rem] lg:text-[1.25rem] group-has-nth-4:text-[0.875rem] sm:group-has-nth-4:text-[1rem] lg:group-has-nth-4:text-[1.125rem] group-has-nth-12:!text-[0.75rem] sm:group-has-nth-12:!text-[0.875rem] lg:group-has-nth-12:!text-[1rem] truncate max-w-[12ch] group-has-nth-4:max-w-[10ch] group-has-nth-12:!max-w-[8ch]">
+                                    {{ p.name }}
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-shrink-0 flex justify-center mt-6 sm:mt-8 lg:mt-10 2xl:mt-12">
+        {% if player == game.host %}
+            <button hx-post="{{ url_for('start_game', game_code=game.code) }}" hx-swap="none" class="w-32 sm:w-36 lg:w-40 xl:w-42 2xl:w-44 text-center text-[1.5rem] sm:text-[1.575rem] lg:text-[1.65rem] xl:text-[1.725rem] 2xl:text-[1.75rem] font-bold leading-none px-5 sm:px-6 lg:px-6.5 xl:px-7 2xl:px-7.5 py-2 sm:py-2.5 lg:py-2.5 xl:py-2.75 2xl:py-3 text-primary-content bg-primary rounded-full hover:brightness-[120%] focus:brightness-[120%] hover:scale-[1.05] focus:scale-[1.05] active:scale-[1.1] transition outline-0 cursor-pointer"
+                    type="button" role="button" tabindex="0"
+            >
+                <span class="block translate-y-px">Start</span>
+            </button>
+        {% else %}
+            <div class="flex items-center gap-2 lg:gap-2.5 2xl:gap-3 text-[0.875rem] sm:text-[1rem] lg:text-[1.125rem] font-medium">
+                <iconify-icon id="clock-icon-{{ game.code }}" icon="solar:clock-circle-outline" class="size-4 lg:size-5 2xl:size-6" height="none"></iconify-icon>
+                <span>Waiting for host to start...</span>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{#
+// Testing utility for the new responsive grid layout
+const container = document.querySelector('.group.grid');
+const firstPlayer = container.children[0];
+
+function setPlayerCount(count) {
+  // Store original player for cloning
+  const originalPlayer = firstPlayer.cloneNode(true);
+
+  // Clear container
+  container.innerHTML = '';
+
+  // Add specified number of players
+  for(let i = 0; i < count; i++) {
+    const player = originalPlayer.cloneNode(true);
+
+    // Update player name - target the main name div
+    const nameEl = player.querySelector('div[class*="text-base"]');
+    if (nameEl) {
+      nameEl.textContent = `Player${i + 1}`;
+    }
+
+    // Randomize avatar
+    const avatarImg = player.querySelector('img');
+    if (avatarImg) {
+      const randomAvatar = Math.floor(Math.random() * 50) + 1;
+      avatarImg.src = avatarImg.src.replace(/avatar-\d+\.png/, `avatar-${randomAvatar}.png`);
+      avatarImg.alt = `Avatar ${randomAvatar}`;
+    }
+
+    // Remove status text for test players (except first player who remains as host)
+    if (i > 0) {
+      const statusEl = player.querySelector('.flex.items-center.justify-center.gap-1');
+      if (statusEl) {
+        statusEl.remove();
+      }
+    }
+
+    container.appendChild(player);
+  }
+
+  // Update player count display
+  const countEl = document.querySelector('.flex.items-center.gap-3 span');
+  if (countEl) {
+    countEl.textContent = `${count} player${count !== 1 ? 's' : ''}`;
+  }
+}
+
+// Test different counts to verify responsive behavior
+setPlayerCount(100);   // Large grid test
+#}

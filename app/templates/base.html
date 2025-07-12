@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Roast Roulette</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='images/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='images/favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', path='images/favicon.ico') }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='images/apple-touch-icon.png') }}" />
+    <meta name="apple-mobile-web-app-title" content="Roast Roulette" />
+
+    <!-- Manifest (https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest) -->
+    <link rel="manifest" href="{{ url_for('static', path='manifest.json') }}">
+
+    <!-- Local Fonts (Baloo 2 & Oxanium) -->
+    <link href="{{ url_for('static', path='css/fonts/google-fonts.css') }}" rel="stylesheet">
+    
+    <!-- TailwindCSS -->
+    <link href="{{ url_for('static', path='css/output.min.css') }}" rel="stylesheet">
+
+    <!-- HTMX (https://htmx.org/) -->
+    <script defer src="{{ url_for('static', path='js/htmx.min.js') }}"></script>
+    <meta name="htmx-config" content='{"historyCacheSize": 0}'>
+
+    <!-- SSE Extension (https://htmx.org/extensions/sse/) -->
+    <script defer src="{{ url_for('static', path='js/htmx-ext-sse.min.js') }}"></script>
+{#    <script defer src="{{ url_for('static', path='js/sse-preserve.js') }}"></script>#}
+
+    <!-- Idiomorph (https://htmx.org/extensions/idiomorph/) -->
+    <script defer src="{{ url_for('static', path='js/vendor/idiomorph-ext.min.js') }}"></script>
+
+    <!-- Preload Extension (https://htmx.org/extensions/preload/) -->
+    <script defer src="{{ url_for('static', path='js/vendor/htmx-ext-preload.min.js') }}"></script>
+
+    <!-- Response Targets Extension (https://htmx.org/extensions/response-targets/) -->
+    <script defer src="{{ url_for('static', path='js/htmx-ext-response-targets.min.js') }}"></script>
+
+    <!-- Hyperscript (https://hyperscript.org/) -->
+    <script defer src="{{ url_for('static', path='js/hyperscript.min.js') }}"></script>
+
+    <!-- <qr-code> Web Component (https://github.com/bitjson/qr-code) -->
+    <script defer src="{{ url_for('static', path='js/qr-code.min.js')}}"></script>
+
+    <!-- <iconify-icon> Web Component (https://iconify.design/docs/iconify-icon/#registering-the-web-component) -->
+    <script defer src="{{ url_for('static', path='js/vendor/iconify-icon.min.js') }}"></script>
+</head>
+<body class="relative bg-linear-175 from-[#130A1B] from-50% to-[#110918] bg-fixed font-oxanium"
+      hx-ext="morph,sse,response-targets,preload"
+>
+<main class="h-dvh overflow-hidden absolute inset-0 p-4 lg:p-8 flex-1 flex flex-col items-center w-full mx-auto starting:opacity-0 starting:scale-[1.02] transition">
+    {% block content %}
+    {% endblock %}
+</main>
+</body>
+</html>

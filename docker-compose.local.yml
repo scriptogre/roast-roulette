@@ -1,20 +1,51 @@
 services:
-  django:
-    build:
-      context: .
-      dockerfile: ./compose/django/Dockerfile
-      args:
-        - ENVIRONMENT=local
-    env_file:
-      - .env
-    volumes:
-      - .:/app:rw
-      # Exclude from bind mount
-      - /app/.venv/
+  fastapi:
+    build: .
     ports:
-      - '8000:8000'
-    command: /start
+      - "8000:8000"
+    volumes:
+      - .:/code
+      - ./media:/code/media  # Persist media files
+    tty: true
+    init: true
+    env_file: .env
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --timeout-graceful-shutdown=1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
 
-  redis:
-    image: redis:latest
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    init: true
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=roast_roulette
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d roast_roulette"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
+
+  nats:
+    image: nats:2.10.24
+    ports:
+      - "4222:4222"
+    init: true
+    command: ["-js"]
+    restart: unless-stopped
+
+  tailwindcss:
+    image: ghcr.io/scriptogre/tailwindcss:latest
+    tty: true
+    volumes:
+      - .:/app
+    command: -i ./app/static/css/input.css -o ./app/static/css/output.min.css --watch --minify
+

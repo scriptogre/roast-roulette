@@ -1,0 +1,47 @@
+    <div class="flex-1 flex flex-col justify-center items-center my-6">
+
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+            <!-- Roast Target Photo -->
+            <figure>
+                <img src="{{ target_photo.base64_url }}"
+                     alt="Roast Target Image"
+                     class="max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md max-h-[300px] rounded-3xl object-cover mx-auto starting:scale-[1.1] transition-all ease-in-out outline-0 select-none"
+                     draggable="false"
+                />
+                <figcaption class="flex flex-col items-center text-center mt-6">
+                    {% if target_photo.caption %}
+                        <span class="max-w-3xs sm:max-w-2xs lg:max-w-xs 2xl:max-w-md lg:text-lg font-bold starting:opacity-0 delay-(--animation-duration) transition duration-500">
+                            {{ target_photo.caption }}
+                        </span>
+                    {% endif %}
+                    <span class="inline-flex items-center gap-2.5 mt-3 starting:opacity-0 delay-[calc(var(--animation-duration)+1s)] transition duration-500">
+                        <div class="rounded-full flex items-center justify-center {{ 'size-4 lg:size-5' if target_photo.caption else 'size-5 lg:size-7' }} bg-(--avatar-color)/20" style="--avatar-color: {{ target_photo.uploaded_by.avatar_color }};">
+                            <iconify-icon icon="ooui:user-avatar" class="text-(--avatar-color) {{ 'size-3 lg:size-3.5' if target_photo.caption else 'size-3.5 lg:size-5' }}" height="none"></iconify-icon>
+                        </div>
+                        <span class="{{ 'text-neutral-400 font-light text-xs lg:text-sm' if target_photo.caption else 'font-semibold lg:text-lg'}} translate-y-[2px]">
+                            {{ target_photo.uploaded_by.name }}
+                        </span>
+                    </span>
+                </figcaption>
+            </figure>
+            <!-- Roast Poem -->
+            <p class="whitespace-pre-wrap max-w-xs sm:max-w-2xs lg:max-w-sm 2xl:max-w-md text-sm sm:text-base lg:text-lg overflow-scroll">
+                {{- turn.roast_poem.text -}}
+            </p>
+        </div>
+
+        {% if game.host == player and turn.phase == TurnPhase.RESULTS %}
+            <div class="flex items-center justify-center mb-12 sm:mb-24 lg:mb-0 mt-12 lg:mt-24 gap-2">
+                <button class="text-2xl lg:text-3xl 2xl:text-4xl font-bold leading-none px-6.5 lg:px-7.5 2xl:px-8 py-2.5 lg:py-2.75 2xl:py-3 text-[#140B1B] bg-[#EC3179] rounded-full hover:brightness-[120%] hover:scale-[1.05] active:scale-[1.1] transition cursor-pointer"
+                        type="button"
+                        role="button"
+                        tabindex="0"
+                        hx-post="{{ url('games:round_start', game_code=game.code) }}"
+                >
+                    <span class="text-lg lg:text-xl 2xl:text-2xl font-bold">
+                        Next Round
+                    </span>
+                </button>
+            </div>
+        {% endif %}
+    </div>

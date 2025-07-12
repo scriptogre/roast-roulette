@@ -327,6 +327,7 @@ dump.rdb
 
 ### Project template
 main/media/
+media/
 
 .pytest_cache/
 .ipython/

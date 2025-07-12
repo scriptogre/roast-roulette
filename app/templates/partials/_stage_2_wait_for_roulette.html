@@ -1,0 +1,45 @@
+{% set target_photo_index = photos.index(target_photo) + 1  %}
+
+<div class="flex-1 flex flex-col justify-center items-center my-6"
+     style="--target-photo-index: {{ target_photo_index }};
+             --photo-width: 300px;
+             --gap-width: 2rem;
+             --start-position: calc(1.5 * var(--photo-width) + 2 * var(--gap-width) + 4px);
+             --center-of-target-photo: calc(var(--start-position)  -  (var(--photo-width) + var(--gap-width)) * var(--target-photo-index));
+             --animation-duration: {{ 5 - (turn.phase_seconds_total - turn.phase_seconds_left) }}s;
+             ">
+    <div class="flex items-center justify-start w-2xl mx-auto gap-(--gap-width)">
+        {% for p in photos %}
+            <figure class="relative inline-grid place-content-center w-(--photo-width) min-w-(--photo-width) max-w-(--photo-width)
+                               starting:translate-x-(--start-position) translate-x-(--center-of-target-photo)
+                               duration-(--animation-duration)">
+                <img src="{{ p.base64_url }}"
+                     alt="Roast Target Image {{ loop.index }}"
+                     draggable="false"
+                     class="object-cover rounded-3xl transition-[transform,opacity] {{ 'starting:opacity-25 opacity-100 starting:scale-[1] scale-[1.05] delay-[calc(var(--animation-duration)-1s)] duration-500' if loop.index == target_photo_index else 'brightness-25' }}" />
+                {% if p.is_roast_target %}
+                    <figcaption class="flex flex-col items-center text-center mt-6">
+                        {% if p.caption %}
+                            <span class="lg:text-lg font-bold starting:opacity-0 delay-(--animation-duration) transition duration-500">
+                                {{ p.caption }}
+                            </span>
+                        {% endif %}
+                        <div class="flex items-center mt-3 starting:opacity-0 delay-[calc(var(--animation-duration)+1s)] transition duration-500">
+                            <!-- Avatar -->
+                            <div class="rounded-full flex items-center justify-center size-5 me-2.5 bg-(--avatar-color)/20" style="--avatar-color: {{ p.uploaded_by.avatar_color }};">
+                                <iconify-icon icon="ooui:user-avatar" class="text-(--avatar-color) size-3.5" height="none"></iconify-icon>
+                            </div>
+                            <!-- Player Name -->
+                            <span class="text-xs sm:text-sm text-purple-neutral-300 truncate">
+                                {{ p.uploaded_by.name }}
+                            </span>
+                        </div>
+                    </figcaption>
+                {% endif %}
+            </figure>
+        {% endfor %}
+    </div>
+    {#    <span class="inline-flex items-center gap-3 lg:text-lg text-purple-neutral-500 leading-none mt-6 lg:mt-9 starting:opacity-0 delay-(--animation-duration) duration-1000 transition">#}
+    {#        <span>{{ "Who would've thought" if game.players.count() == 1 else 'Get ready...' }}</span>#}
+    {#    </span>#}
+</div>

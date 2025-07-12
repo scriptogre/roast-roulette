@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+
+# Common
+# --------------------------------------------------
+alembic upgrade head
+
+
+if [ "$ENVIRONMENT" = "local" ]; then
+    # Local
+    # --------------------------------------------------
+
+    echo "Running in local development mode"
+
+    # uvicorn w/ auto-reload
+    exec uvicorn main.app:app --host 0.0.0.0 --port 8000 --reload
+
+elif [ "$ENVIRONMENT" = "production" ] || [ "$ENVIRONMENT" = "staging" ]; then
+    # Production
+    # --------------------------------------------------
+
+    echo "Running in production mode"
+
+    # uvicorn for production
+    exec uvicorn main.app:app --host 0.0.0.0 --port 8000 --workers 4
+fi

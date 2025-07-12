@@ -1,28 +1,38 @@
-volumes:
-  sqlite:          # Named volume for SQLite database
-  staticfiles:     # Named volume for static files
-  media:           # Named volume for media files (uploads)
-
 services:
-  django:
-    build:
-      context: .
-      dockerfile: ./compose/django/Dockerfile
-      args:
-        - ENVIRONMENT=production
-    volumes:
-      - sqlite:/app/data/:rw
-      - staticfiles:/app/staticfiles/:rw
-      - media:/app/media/:rw
-    depends_on:
-      - redis
-    env_file:
-      - .env
-    command: /start
+  fastapi:
+    build: .
     ports:
-      - '${PORT}:8000'
+      - "8000:8000"
+    volumes:
+      - .:/code
+    tty: true
+    env_file: .env
+    command: uvicorn main.app:app --host 0.0.0.0 --port 8000 --workers 9 --timeout-graceful-shutdown=5
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    init: true
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=roast_roulette
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d roast_roulette"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
-  redis:
-    image: redis:latest
+  nats:
+    image: nats:2.10.24
+    command: ["-js"]
     restart: unless-stopped

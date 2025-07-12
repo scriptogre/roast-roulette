@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {# Hidden heartbeat element #}
+    <div hx-post="{{ url_for('heartbeat', game_code=game.code) }}"
+         hx-trigger="load delay:100ms, every 5s"
+         hx-swap="none"
+         class="hidden">
+    </div>
+    
+    <div class="size-full flex flex-col justify-center items-center"
+         sse-connect="{{ url_for('get_game_events', game_code=game.code) }}"
+         sse-swap="refreshGame"
+         hx-swap="outerHTML"
+    >
+        {% block game_state %}
+            {% include 'partials/_notifications.html' %}
+
+            <div id="game-{{ game.code }}" class="flex-1 size-full flex flex-col justify-center items-center">
+
+                {% if game.is_in_lobby %}
+                    {% include 'partials/_lobby.html' %}
+                {% else %}
+                    {#                {% include 'games/partials/_stage_header.html' %}#}
+                    {#                {% set phase_number = (TurnPhase|list).index(turn.phase) + 1 %}#}
+                    {#                {% set phase_slug = '_'.join(turn.phase.lower().split()) %}#}
+                    {#                {% include 'games/partials/_stage_'~phase_number~'_'~phase_slug~'.html' %}#}
+                    {#                {% include 'games/partials/_player_list_in_game.html' %}#}
+                {% endif %}
+            </div>
+        {% endblock game_state %}
+    </div>
+{% endblock %}

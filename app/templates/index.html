@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <img src="{{ url_for('static', path='images/hero.svg') }}" alt="Logo with Elements" class="fixed inset-0 size-full -z-50" style="filter: blur(16px)" />
+
+    <!-- Player Indicator (if player exists) -->
+    {% if player %}
+        <div class="absolute top-6 right-7.5 lg:top-8 lg:right-10 flex items-center gap-2 sm:gap-2.5 lg:gap-3 xl:gap-3.5 2xl:gap-4 transition starting:-translate-y-[200%] delay-300 duration-300">
+            <img src="{{ url_for('static', path='images/avatars/avatar-' + player.avatar|string + '.png') }}" alt="Player Avatar" class="size-5 sm:size-6 lg:size-7 xl:size-8 2xl:size-9 rounded-full" />
+            <span class="text-xs sm:text-sm lg:text-base xl:text-lg 2xl:text-xl font-medium text-white">{{ player.name }}</span>
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="flex flex-col justify-center items-center size-full">
+        {#        <img src="{{ url_for('static', path='images/hero.svg') }}" alt="Logo with Elements" class="max-w-[12rem] sm:max-w-[14rem] lg:max-w-[16rem] xl:max-w-[17rem] 2xl:max-w-[18rem]" />#}
+
+        <h1 class="text-primary text-[3rem] sm:text-[3.5rem] lg:text-[4rem] xl:text-[4.25rem] 2xl:text-[4.5rem] font-baloo-2 text-center leading-none tracking-tight font-bold uppercase scale-y-[1.1] -mt-13 sm:-mt-16 lg:-mt-18 xl:-mt-19 2xl:-mt-20">
+            <span class="drop-shadow-xl">
+                Roast
+            </span>
+            <span class="block -translate-y-3 sm:-translate-y-3.5 lg:-translate-y-4 xl:-translate-y-4 2xl:-translate-y-4">
+                Roulette
+            </span>
+        </h1>
+        <p class="text-lg sm:text-xl lg:text-[1.375rem] xl:text-2xl 2xl:text-[1.675rem] leading-none font-light text-purple-neutral-500 lg:mt-1 xl:mt-1.5 2xl:mt-2">
+            Get roasted by an AI, but try not to cry
+        </p>
+
+        <div class="flex items-center mt-6 sm:mt-7 lg:mt-8 xl:mt-[2.125rem] 2xl:mt-9 gap-6 sm:gap-7 lg:gap-8 xl:gap-[2.125rem] 2xl:gap-9">
+{#            {% if player %}#}
+                <!-- Create Game -->
+{#                <form action="{{ url_for('create_new_game') }}" method="POST">#}
+                <form action="#" method="POST">
+                    <button type="submit" class="w-40 sm:w-44 lg:w-46 xl:w-48 2xl:w-50 text-center text-[1.5rem] sm:text-[1.575rem] lg:text-[1.65rem] xl:text-[1.725rem] 2xl:text-[1.75rem] font-bold leading-none px-5 sm:px-6 lg:px-6.5 xl:px-7 2xl:px-7.5 py-2 sm:py-2.5 lg:py-2.5 xl:py-2.75 2xl:py-3 text-primary-content bg-primary rounded-full hover:brightness-[120%] focus:brightness-[120%] hover:scale-[1.05] focus:scale-[1.05] active:scale-[1.1] transition outline-0 cursor-pointer">
+                        <span class="block translate-y-px">
+                            Create
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Join Game -->
+                <button class="w-40 sm:w-44 lg:w-46 xl:w-48 2xl:w-50 text-center text-[1.5rem] sm:text-[1.575rem] lg:text-[1.65rem] xl:text-[1.725rem] 2xl:text-[1.75rem] font-bold leading-none px-5 sm:px-6 lg:px-6.5 xl:px-7 2xl:px-7.5 py-2 sm:py-2.5 lg:py-2.5 xl:py-2.75 2xl:py-3 text-primary-content bg-primary rounded-full hover:brightness-[120%] focus:brightness-[120%] hover:scale-[1.05] focus:scale-[1.05] active:scale-[1.1] transition outline-0 cursor-pointer"
+                        _="on click add .hidden then remove .hidden from next <form/>"
+                >
+                    <span class="block translate-y-px">
+                        Join
+                    </span>
+                </button>
+{#                <form action="{{ url_for('submit_join_game_form') }}" method="POST" class="hidden flex items-stretch w-40 sm:w-44 lg:w-46 xl:w-48 2xl:w-50 starting:scale-[1.1] starting:brightness-[120%] transition">#}
+                <form action="#" method="POST" class="hidden flex items-stretch w-40 sm:w-44 lg:w-46 xl:w-48 2xl:w-50 starting:scale-[1.1] starting:brightness-[120%] transition">
+                    <input type="text" name="game_code" placeholder="ABCD" maxlength="4" minlength="4" required
+                           class="w-full text-center text-[1.5rem] sm:text-[1.575rem] lg:text-[1.65rem] xl:text-[1.725rem] 2xl:text-[1.75rem] font-bold uppercase bg-purple-neutral-900 border-l border-y border-purple-neutral-800 rounded-l-full rounded-r-lg px-2 py-1 text-white placeholder-white/50 focus:border-primary focus:outline-none transition">
+                    <button type="submit" class="inline-grid place-content-center ps-4 pe-6 text-primary-content bg-primary border border-primary rounded-l-lg rounded-r-full hover:brightness-[120%] focus:brightness-[120%] transition outline-0 cursor-pointer">
+                        <iconify-icon icon="iconamoon:enter-bold" class="size-7" height="none"></iconify-icon>
+                    </button>
+                </form>
+{#            {% else %}#}
+{#                <!-- Auto-show player creation dialog on page load -->#}
+{#                <div hx-get="{{ url_for('get_player_form_dialog') }}"#}
+{#                     hx-swap="beforeend"#}
+{#                     hx-target="body"#}
+{#                     hx-select="dialog"#}
+{#                     hx-trigger="load"#}
+{#                     class="hidden">#}
+{#                </div>#}
+{##}
+{#                <!-- Show disabled buttons and CTA text -->#}
+{#                <div class="flex flex-col items-center gap-6">#}
+{#                    <div class="flex items-center gap-6 sm:gap-7 lg:gap-8 xl:gap-[2.125rem] 2xl:gap-9">#}
+{#                        <button disabled class="w-40 sm:w-44 lg:w-46 xl:w-48 2xl:w-50 text-center text-[1.5rem] sm:text-[1.575rem] lg:text-[1.65rem] xl:text-[1.725rem] 2xl:text-[1.75rem] font-bold leading-none px-5 sm:px-6 lg:px-6.5 xl:px-7 2xl:px-7.5 py-2 sm:py-2.5 lg:py-2.5 xl:py-2.75 2xl:py-3 text-primary-content/50 bg-primary/50 rounded-full cursor-not-allowed">#}
+{#                            <span class="block translate-y-px">#}
+{#                                Create#}
+{#                            </span>#}
+{#                        </button>#}
+{#                        <button disabled class="w-40 sm:w-44 lg:w-46 xl:w-48 2xl:w-50 text-center text-[1.5rem] sm:text-[1.575rem] lg:text-[1.65rem] xl:text-[1.725rem] 2xl:text-[1.75rem] font-bold leading-none px-5 sm:px-6 lg:px-6.5 xl:px-7 2xl:px-7.5 py-2 sm:py-2.5 lg:py-2.5 xl:py-2.75 2xl:py-3 text-primary-content/50 bg-primary/50 rounded-full cursor-not-allowed">#}
+{#                            <span class="block translate-y-px">#}
+{#                                Join#}
+{#                            </span>#}
+{#                        </button>#}
+{#                    </div>#}
+{##}
+{#                    <!-- Clean CTA text below buttons -->#}
+{#                    <p class="text-primary text-lg sm:text-xl lg:text-2xl font-bold text-center">#}
+{#                        Press anywhere to create player#}
+{#                    </p>#}
+{#                </div>#}
+{##}
+{#                <!-- Full-screen invisible overlay for player creation -->#}
+{#                <div class="fixed inset-0 z-10 cursor-pointer"#}
+{#                     hx-get="{{ url_for('get_player_form_dialog') }}"#}
+{#                     hx-swap="beforeend"#}
+{#                     hx-target="body"#}
+{#                     hx-select="dialog"#}
+{#                     role="button"#}
+{#                     tabindex="0"#}
+{#                     aria-label="Create player"#}
+{#                     onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">#}
+{#                </div>#}
+{#            {% endif %}#}
+        </div>
+
+        <!-- Active Games Section -->
+        {#        {% if active_games %}#}
+        {#            <div class="mt-8 sm:mt-10 lg:mt-12 xl:mt-14 2xl:mt-16 w-full max-w-4xl px-4">#}
+        {#                <h2 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-center text-white mb-4 sm:mb-5 lg:mb-6 xl:mb-7 2xl:mb-8">#}
+        {#                    Your Active Games#}
+        {#                </h2>#}
+        {#                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 xl:gap-7 2xl:gap-8">#}
+        {#                    {% for game in active_games %}#}
+        {#                        <a href="/{{ game.code }}" class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-4 sm:p-5 lg:p-6 xl:p-7 2xl:p-8 hover:bg-white/20 transition-all duration-200 hover:scale-[1.02] block">#}
+        {#                            <div class="flex items-center justify-between mb-2 sm:mb-3 lg:mb-4">#}
+        {#                                <span class="text-lg sm:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-bold text-primary">#}
+        {#                                    {{ game.code }}#}
+        {#                                </span>#}
+        {#                                <span class="text-xs sm:text-sm lg:text-base xl:text-lg 2xl:text-xl px-2 sm:px-2.5 lg:px-3 xl:px-3.5 2xl:px-4 py-1 sm:py-1.5 lg:py-2 xl:py-2.5 2xl:py-3 bg-primary/20 text-primary rounded-full">#}
+        {#                                    {{ game.status.value.replace('_', ' ').title() }}#}
+        {#                                </span>#}
+        {#                            </div>#}
+        {#                            <div class="text-sm sm:text-base lg:text-lg xl:text-xl 2xl:text-2xl text-white/80">#}
+        {#                                {{ game.connections | selectattr('is_active') | list | length }} players#}
+        {#                            </div>#}
+        {#                        </a>#}
+        {#                    {% endfor %}#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        {% endif %}#}
+    </div>
+
+    <!-- GitHub Repository Link - Bottom Footer -->
+    <a href="https://github.com/scriptogre/roast-roulette" target="_blank" rel="noopener noreferrer"
+       class="group absolute bottom-4 sm:bottom-5 lg:bottom-6 xl:bottom-7 2xl:bottom-8 flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 xl:gap-2.75 2xl:gap-3 text-xs sm:text-sm lg:text-base xl:text-lg 2xl:text-xl text-neutral-300 hover:text-primary transition">
+        <iconify-icon icon="mdi:github" class="size-4 sm:size-4.5 lg:size-5 xl:size-5.5 2xl:size-6" height="none"></iconify-icon>
+        <span class="font-medium translate-y-px">
+            Source Code
+        </span>
+    </a>
+{% endblock %}

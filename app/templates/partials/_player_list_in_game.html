@@ -1,0 +1,41 @@
+<label class="peer group fixed top-full lg:right-8 max-h-[90%] px-5 py-4 lg:max-h-[50%] max-w-2xs sm:max-w-xs size-full flex flex-col mx-auto z-10 border border-purple-neutral-900/50 bg-[#130A1A] rounded-t-3xl -translate-y-13 has-checked:-translate-y-full transition duration-200 cursor-pointer outline-0 select-none">
+    <!-- Menu Toggle -->
+    <input type="checkbox" class="peer hidden" id="players-menu-toggle">
+
+    <!-- Menu Header -->
+    <span class="group flex items-center justify-between">
+        <span class="flex items-center text-sm sm:text-base">
+            <iconify-icon icon="fa-solid:users" class="size-3.5 sm:size-4" height="none"></iconify-icon>
+            <span class="ms-4 translate-y-px">
+                Players ({{ players|length }})
+            </span>
+        </span>
+        <span class="flex group-peer-checked:hidden gap-1">
+            {% for p in players[:5] %}
+                <!-- Small Avatar -->
+                <div class="rounded-full flex items-center justify-center size-4 bg-(--avatar-color)/20" style="--avatar-color: {{ p.avatar_color }};">
+                    <iconify-icon icon="ooui:user-avatar" class="text-(--avatar-color) size-3" height="none"></iconify-icon>
+                </div>
+            {% endfor %}
+        </span>
+    </span>
+
+    <!-- Menu Content -->
+    <span class="flex-1 flex flex-col max-h-[calc(100%-3rem)] overflow-y-auto overflow-x-hidden px-1.25 mt-6">
+        {% for p in players %}
+            {% set is_current_player = (p == player) %}
+            <div class="flex items-center mt-3">
+                <!-- Avatar -->
+                <div class="rounded-full flex items-center justify-center size-5 bg-(--avatar-color)/20" style="--avatar-color: {{ p.avatar_color }};">
+                    <iconify-icon icon="ooui:user-avatar" class="text-(--avatar-color) size-3.5" height="none"></iconify-icon>
+                </div>
+                <!-- Player Name -->
+                <span class="text-xs sm:text-sm text-purple-neutral-300 truncate mx-2.5">
+                    {{ p.name ~ (' (You)' if is_current_player) }}
+                </span>
+            </div>
+        {% endfor %}
+    </span>
+</label>
+{# Backdrop (Mobile) #}
+<label for="players-menu-toggle" class="lg:hidden fixed inset-0 backdrop-blur-xs invisible opacity-0 peer-has-checked:visible peer-has-checked:opacity-100 transition-opacity"></label>

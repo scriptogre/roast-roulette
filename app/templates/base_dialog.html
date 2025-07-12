@@ -1,0 +1,13 @@
+<dialog class="size-full flex items-center justify-center z-50 text-purple-neutral-200 bg-transparent"
+        open
+        _="on close or keyup[event.key=='Escape'] from body
+            remove me">
+
+    <!-- Backdrop (click to close) -->
+    <form method="dialog">
+        <button aria-label="Close dialog" class="fixed inset-0 cursor-pointer starting:opacity-0 starting:invisible bg-black/75 transition transition-discrete duration-500 -z-10"></button>
+    </form>
+
+    <!-- Dialog content -->
+    {% block dialog_content %}{% endblock %}
+</dialog>

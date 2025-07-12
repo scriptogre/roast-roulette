@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+@import 'fonts.css';
+
+@theme {
+  --font-oxanium: 'Oxanium', sans-serif;
+  --font-baloo-2: 'Baloo 2', sans-serif;
+
+  --color-primary: hsl(337, 83%, 55%);
+  --color-primary-content: #140B1B;
+
+  --color-purple-neutral-200: color-mix(in oklab, var(--color-purple-200) 20%, var(--color-neutral-300));
+  --color-purple-neutral-300: color-mix(in oklab, var(--color-purple-300) 20%, var(--color-neutral-400));
+  --color-purple-neutral-400: #827690; /* color-mix(in oklab, var(--color-purple-400) 20%, var(--color-neutral-500)); */
+  --color-purple-neutral-500: #635575; /* color-mix(in oklab, var(--color-purple-500) 20%, var(--color-neutral-600)); */
+  --color-purple-neutral-600: color-mix(in oklab, var(--color-purple-600) 20%, var(--color-neutral-700)); /*color-mix(in oklab, var(--color-purple-600) 20%, var(--color-neutral-700)); */
+  --color-purple-neutral-700: color-mix(in oklab, var(--color-purple-700) 20%, var(--color-neutral-800));
+  --color-purple-neutral-800: #261D33; /*color-mix(in oklab, var(--color-purple-800) 20%, var(--color-neutral-900)); */
+  --color-purple-neutral-900: #181021; /* color-mix(in oklab, var(--color-purple-900) 20%, var(--color-neutral-950)); */
+}
+
+@layer base {
+  html {
+    @apply text-neutral-300 touch-manipulation;
+  }
+  /* Prevent layout shift on page load */
+  iconify-icon {
+    @apply inline-block size-4
+  }
+}

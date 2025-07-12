@@ -1,0 +1,35 @@
+<!-- Notification Container -->
+<div id="notifications" class="fixed top-4 right-4 lg:top-8 lg:right-8 z-50 flex flex-col gap-3 max-w-sm w-full">
+
+{% for notification in get_latest_notifications(game) %}
+    <div role="alert"
+         class="notification bg-purple-neutral-900 border border-purple-neutral-700/50 rounded-2xl p-4 shadow-lg transition starting:translate-x-12"
+         _="init wait 5s then remove me">
+        <div class="flex items-center gap-3">
+            {% if notification.type == 'player_joined' %}
+                <div class="flex-shrink-0 size-8 bg-primary/20 rounded-full flex items-center justify-center">
+                    <iconify-icon icon="solar:user-plus-bold" class="size-4 text-primary" height="none"></iconify-icon>
+                </div>
+            {% elif notification.type == 'player_reconnected' %}
+                <div class="flex-shrink-0 size-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <iconify-icon icon="solar:refresh-bold" class="size-4 text-green-400" height="none"></iconify-icon>
+                </div>
+            {% elif notification.type == 'player_left' %}
+                <div class="flex-shrink-0 size-8 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <iconify-icon icon="solar:user-minus-bold" class="size-4 text-red-400" height="none"></iconify-icon>
+                </div>
+            {% endif %}
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-purple-neutral-200 truncate">
+                    {{ notification.message }}
+                </p>
+            </div>
+            <button class="flex-shrink-0 text-purple-neutral-400 hover:text-purple-neutral-200 transition p-1 -m-1"
+                    onclick="this.closest('[role=alert]').remove()">
+                <iconify-icon icon="solar:close-circle-bold" class="size-4" height="none"></iconify-icon>
+            </button>
+        </div>
+    </div>
+{% endfor %}
+
+</div>
