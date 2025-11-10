@@ -1,0 +1,72 @@
+{% extends 'base_dialog.html' %}
+
+{% block dialog_content %}
+    <div class="p-7 pt-6 sm:p-8 sm:pt-7 lg:p-9 lg:pt-8 shadow-xs flex flex-col rounded-4xl bg-purple-neutral-900 border border-purple-neutral-800 transition duration-500 starting:opacity-0 starting:translate-y-full starting:invisible max-w-md mx-auto">
+
+        <header>
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-white">Create Player</h2>
+            <p class="mt-3 sm:mt-3.5 lg:mt-4 text-purple-neutral-300 text-sm sm:text-base lg:text-lg">Choose your avatar & enter your name</p>
+        </header>
+
+        <div class="relative flex-1 flex flex-col justify-center items-center mt-7 sm:mt-8 lg:mt-9">
+
+            <form class="w-full flex flex-col items-center select-none"
+                  action="{{ url_for('submit_player_form') }}"
+                  method="POST"
+                  hx-target-error="next span"
+            >
+                <!-- Avatar Section -->
+                <div class="flex flex-col items-center">
+                    {% block avatar_switcher %}
+                        {% set avatar = range(1, 100) | random %}
+                        <!-- Stores avatar value -->
+                        <input type="hidden" name="avatar" value="{{ avatar }}">
+                        <!-- Player Avatar -->
+                        <button hx-get="{{ url_for('get_player_form_dialog') }}"
+                                hx-headers='{"block_name": "avatar_switcher"}'
+                                hx-swap="morph"
+                                type="button"
+                                class="avatar-button relative size-24 lg:size-28 xl:size-[7.5rem] 2xl:size-32 rounded-full inline-grid place-content-center border-purple-neutral-700 active:border-primary active:duration-150 hover:border-purple-neutral-500 border-2 transition cursor-pointer overflow-hidden group"
+                                ontouchstart="// Apply `active:` styles"
+                                title="Click to change avatar">
+                            <img src="{{ url_for('static', path='images/avatars/avatar-'~avatar~'.png') }}" alt="Avatar {{ avatar }}" class="m-auto size-[90%] object-cover group-hover:scale-105 transition">
+                            <!-- Subtle overlay on hover -->
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
+                                <iconify-icon icon="solar:refresh-bold" class="size-6 text-white" height="none"></iconify-icon>
+                            </div>
+                        </button>
+                    {% endblock %}
+                    <p class="text-[0.625rem] sm:text-xs lg:text-sm text-purple-neutral-500 mt-1.5 sm:mt-1.75 lg:mt-2 text-center">Click to randomize</p>
+                </div>
+
+                <!-- Player Name -->
+                <div class="flex flex-col items-center w-full mt-4.5 sm:mt-5.25 lg:mt-6">
+                    <div class="group flex items-center rounded-full leading-none w-full px-4 lg:px-6 py-2.5 sm:py-2.75 lg:py-3 bg-purple-neutral-900 border border-purple-neutral-800 hover:border-purple-neutral-500 has-focus:border-primary transition">
+                        <input class="text-sm sm:text-base lg:text-lg w-full font-semibold outline-none placeholder-purple-neutral-400 placeholder:font-normal bg-transparent text-white"
+                               type="text"
+                               name="name"
+                               placeholder="Enter your name"
+                               minlength="3"
+                               maxlength="32"
+                               required
+                               autocomplete="off"
+                        />
+                    </div>
+                </div>
+
+
+                <button class="w-full text-center text-base sm:text-lg lg:text-xl font-bold leading-none px-6 py-3 sm:py-3.25 lg:py-3.5 mt-4.5 sm:mt-5.25 lg:mt-6 text-primary-content bg-primary rounded-full hover:brightness-[120%] focus:brightness-[120%] hover:scale-[1.02] focus:scale-[1.02] active:scale-[1.05] transition outline-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" type="submit">
+                    Submit
+                </button>
+            </form>
+
+            <!-- Error Messages -->
+            <div class="has-[.error-message:empty]:hidden mt-4.5 sm:mt-5.25 lg:mt-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-center max-w-[16rem] sm:max-w-[18rem] lg:max-w-[20rem] w-full">
+                <span class="text-sm text-red-400 flex items-center justify-center gap-2">
+                    <iconify-icon icon="solar:danger-bold" class="size-4" height="none"></iconify-icon>
+                    <span class="error-message">{#- Errors here -#}</span>
+                </span>
+            </div>
+        </div>
+    </div>
+{% endblock %}
