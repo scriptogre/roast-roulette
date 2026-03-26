@@ -1,0 +1,60 @@
+@import 'tailwindcss';
+
+@source inline('border-pink-500/{0..100..10}');
+
+@theme {
+  --default-transition-duration: 300ms;
+
+  --font-oxanium: 'Oxanium', sans-serif;
+  --font-baloo-2: 'Baloo 2', sans-serif;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.5rem;
+  --text-4xl: 1.625rem;
+  --text-5xl: 1.75rem;
+  --text-6xl: 1.875rem;
+  --text-7xl: 2rem;
+  --text-8xl: 2.125rem;
+  --text-9xl: 2.25rem;
+  --text-10xl: 3rem;
+  --text-logo: 3.5rem;
+  --color-neutral-350: #BBBBBB;
+
+  --color-pink-500: hsl(337, 83%, 55%);
+  --color-pink-600: hsl(337, 83%, 50%);
+  --color-pink-700: hsl(337, 83%, 45%);
+  --color-pink-800: hsl(337, 83%, 40%);
+  --color-pink-900: hsl(337, 83%, 35%);
+  --color-purple-neutral-50: hsl(269, 24%, 60%);
+  --color-purple-neutral-100: hsl(269, 24%, 55%);
+  --color-purple-neutral-200: hsl(269, 24%, 50%);
+  --color-purple-neutral-300: hsl(269, 24%, 45%);
+  --color-purple-neutral-400: hsl(269, 24%, 40%);
+  --color-purple-neutral-500: hsl(269, 24%, 35%);
+  --color-purple-neutral-600: hsl(269, 24%, 30%);
+  --color-purple-neutral-700: hsl(269, 24%, 25%);
+  --color-purple-neutral-800: hsl(269, 24%, 20%);
+  --color-purple-neutral-900: hsl(269, 24%, 15%);
+  --color-purple-neutral-950: hsl(269, 24%, 7%);
+}
+
+@layer base {
+  html {
+    @apply text-neutral-300;
+  }
+  iconify-icon {
+    @apply inline-block size-[1em]
+  }
+}
+
+@layer utilities {
+  /* For Webkit-based browsers (Chrome, Safari and Opera) */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* For IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}

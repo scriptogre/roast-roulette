@@ -1,0 +1,86 @@
+{% set photo = game.round.roast_target_photo %}
+
+<div class="flex-1 w-full flex flex-col items-center justify-center my-6">
+
+    <!-- Roast Target Photo -->
+    <figure class="flex flex-col justify-center items-center">
+        <span class="hidden lg:inline-flex items-center gap-1.5 font-light text-purple-neutral-500 lg:mb-4.5">
+            <iconify-icon icon="material-symbols:pinch-zoom-out"></iconify-icon>
+            <span>Press to zoom in/out</span>
+        </span>
+        <img src="{{ photo.base64_url }}"
+             alt="Roast Target Image"
+             class="max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md max-h-[300px] rounded-3xl object-cover mx-auto starting:scale-[1.1] transition-all ease-in-out lg:focus:scale-[2.5] lg:z-10 lg:cursor-pointer outline-0 select-none"
+             tabindex="0"
+             draggable="false"
+             hx-on:keydown="event.key == 'Escape' && this.blur()"
+             hx-on:mousedown="document.activeElement == this && (event.preventDefault() || this.blur())"
+        />
+    </figure>
+
+    <!-- Roast Ideas -->
+    <form class="max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md select-none"
+          _="init set $current_index to 0"
+          style="--index: 0"
+    >
+
+        <div class="flex items-center w-full overflow-hidden my-4.5 lg:my-6">
+            {% for idea in game.round.roast_ideas.all() %}
+                <label class="group relative text-left min-w-[100%] max-w-[100%] transition-transform duration-150 -translate-x-[calc(var(--index)*100%)] cursor-pointer
+                              before:content-['']
+                              before:absolute
+                              before:size-full
+                              before:left-1/2
+                              before:-translate-x-1/2
+                              before:bg-(image:--laughing-emoji-background)
+                              before:bg-center
+                              before:bg-no-repeat
+                              before:bg-size-[50%]
+                              before:rounded-2xl
+                              before:transition
+                              before:opacity-0
+                              has-checked:before:opacity-5"
+                       style="--laughing-emoji-background: url({{- static('images/laughing-emoji.png') -}});"
+                >
+                    <input type="checkbox" class="peer invisible opacity-0 absolute inset-0"
+                           hx-post="{{ url('games:roast_idea_toggle_vote', game_code=game.code, roast_idea_id=idea.id) }}"
+                            {% if idea.has_player_voted(player) %}
+                           checked
+                            {% endif %}
+                    />
+                    <span class="flex py-4 px-4.5 lg:py-5 lg:px-5.5 2xl:py-6 2xl:px-6.5 rounded-2xl bg-purple-neutral-900/25 border border-purple-neutral-900/50 group-hover:border-purple-neutral-300 peer-checked:text-pink-500 peer-checked:border-pink-500/50 transition">
+                        <span class="w-full field-sizing-content overflow-hidden text-sm sm:text-base lg:text-lg 2xl:text-xl outline-none resize-none">
+                            {{- idea.text -}}
+                        </span>
+                    </span>
+
+                    <span class="absolute top-1.75 lg:top-2.25 2xl:top-2.5 right-4 text-[0.625rem] lg:text-xs text-purple-neutral-300 peer-checked:text-pink-500 transition">
+                        #{{ loop.index }}
+                    </span>
+
+                    <span id="voted-text" class="absolute bottom-2 right-4 text-[0.625rem] lg:text-xs text-pink-500 inline-flex items-center opacity-0 scale-[1.5] peer-checked:opacity-100 peer-checked:scale-[1] transition">
+                        <iconify-icon icon="lets-icons:check-fill" class="me-1.5 scale-[1.1]"></iconify-icon>
+                        <span class="font-semibold">Voted</span>
+                    </span>
+                </label>
+            {% endfor %}
+        </div>
+
+        <!-- Roast Navigation -->
+        <div class="flex items-center justify-center 2xl:group-has-nth-3:size-22 gap-1.5 lg:gap-3">
+            {% for direction, condition in [
+                ('left', '$current_index > 0'),
+                ('right', '$current_index < '~(game.round.roast_ideas.count() - 1))
+            ] %}
+                <button class="flex-1 inline-grid place-items-center py-1.5 lg:py-3 cursor-pointer text-purple-neutral-300 hover:text-pink-500 active:text-pink-500 hover:bg-purple-neutral-900/50 active:bg-purple-neutral-900/50 !outline-none transition-colors rounded-xl" type="button" role="button"
+                        tabindex="0"
+                        _="on click[{{ condition }}]
+                        {{ 'decrement' if direction == 'left' else 'increment' }} $current_index
+                        set *cssText of the closest <form/> to `--index: ${$current_index}`"
+                >
+                    <iconify-icon icon="ph:arrow-{{ direction }}-thin" class="size-8" height="none"></iconify-icon>
+                </button>
+            {% endfor %}
+        </div>
+    </form>
+</div>

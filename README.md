@@ -1,5 +1,5 @@
 # Roast Roulette 🔥🎲
-s
+
 A multiplayer party game where AI roasts players' photos.
 
 ## Quick Start

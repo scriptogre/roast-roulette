@@ -1,0 +1,27 @@
+<div class="flex-1 flex flex-col items-center justify-center my-6">
+
+    <div class="flex flex-col gap-6 max-h-[500px] overflow-scroll scrollbar-hide">
+        {% for idea in game.round.get_most_voted_ideas() %}
+            <div class="group relative text-left max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md w-full">
+                <span class="flex py-3 px-4 lg:py-4 lg:px-5 2xl:py-5 2xl:px-6 rounded-2xl bg-purple-neutral-900/25 border {{ 'border-pink-500/'~(100 - loop.index * 20) if not loop.last else 'border-pink-500/10'}}">
+                    <span class="w-full field-sizing-content overflow-hidden text-sm sm:text-base lg:text-lg 2xl:text-xl outline-none resize-none">
+                        {{- idea.text -}}
+                    </span>
+                </span>
+                <span id="votes-count" class="flex items-center justify-end w-full gap-3 text-[0.625rem] lg:text-xs text-pink-500 inline-flex items-center mt-3"
+                >
+                    <span class="flex items-center gap-0.75 overflow-scroll scrollbar-hide">
+                        {% for vote in idea.votes_received.all() %}
+                            <img src="{{ static('images/avatar/' ~ vote.player.avatar ~ '.svg') }}" class="size-3"/>
+                        {% endfor %}
+                    </span>
+                    {% if idea.votes_received.count() > 0 %}
+                        <span>•</span>
+                    {% endif %}
+                    <span class="whitespace-nowrap">{{ idea.vote_count }} votes</span>
+                </span>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>

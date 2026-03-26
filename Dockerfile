@@ -3,6 +3,8 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
 
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
 # Disable Python downloads, because we want to use the existing system interpreter across both images.

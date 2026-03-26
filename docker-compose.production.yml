@@ -1,38 +1,34 @@
 services:
-  fastapi:
-    build: .
-    ports:
-      - "8000:8000"
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+      args:
+        - ENVIRONMENT=production
+    expose: [ 8000 ]
+    networks:
+      - proxy
+      - default
     volumes:
-      - .:/code
-    tty: true
-    env_file: .env
-    command: uvicorn main.app:app --host 0.0.0.0 --port 8000 --workers 9 --timeout-graceful-shutdown=5
+      - sqlite:/app/data/:rw
+      - staticfiles:/app/staticfiles/:rw
+      - media:/app/media/:rw
     depends_on:
-      postgres:
-        condition: service_healthy
-      nats:
-        condition: service_started
-
-  postgres:
-    image: postgres:17
-    ports:
-      - "5432:5432"
-    init: true
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=roast_roulette
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d roast_roulette"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - redis
+    env_file:
+      - .env
+    command: /start
     restart: unless-stopped
 
-  nats:
-    image: nats:2.10.24
-    command: ["-js"]
+  redis:
+    image: redis:latest
     restart: unless-stopped
+
+volumes:
+  sqlite:
+  staticfiles:
+  media:
+
+networks:
+  proxy:
+    external: true

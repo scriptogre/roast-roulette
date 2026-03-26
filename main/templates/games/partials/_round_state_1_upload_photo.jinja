@@ -1,0 +1,69 @@
+{% set photo = game.round.photo_for(player) %}
+
+<div class="flex-1 flex flex-col justify-center items-center my-6">
+    <!-- Uploading -->
+    {% if not photo %}
+        <!-- Photo Uploader -->
+        <label id="photo-upload"
+               tabindex="0"
+               class="group relative flex flex-col items-center justify-center rounded-3xl bg-neutral-300/2.5 hover:bg-neutral-300/5 focus:bg-neutral-300/5 border border-dashed border-neutral-300/20 w-2xs sm:w-xs lg:w-sm aspect-4/3 select-none cursor-pointer hover:border-purple-neutral-300 focus:border-pink-500 hover:scale-[1.02] focus:scale-[1.02] outline-0 transition ease-in-out">
+            <input name="photo" type="file" class="appearance-none absolute inset-0 invisible"
+                   hx-post="{{ url('games:photo_upload', game_code=game.code) }}"
+                   hx-encoding='multipart/form-data'
+                   hx-validate="true"
+                   hx-target-4*="#form-errors"
+                   hx-on::validation:validate="event.target.files[0].size >= 10**7 && (this.setCustomValidity('Photo must be less than 10MB.') | this.reportValidity())"
+                   hx-on:click="this.setCustomValidity('')"
+                   accept="image/jpeg,image/png"
+            >
+            <iconify-icon icon="bi:image-fill" class="size-9 sm:size-10 lg:size-11 2xl:size-12 group-focus:text-pink-500 transition" height="none"></iconify-icon>
+            <span class="text-lg lg:text-xl leading-none font-bold mt-4 sm:mt-4.5 lg:mt-5 2xl:mt-5.5">
+                Upload a photo
+            </span>
+            <span class="lg:text-lg text-neutral-400 font-light mt-2 sm:mt-2.25 lg:mt-2.5 2xl:mt-2.75">
+                Before the timer runs out!
+            </span>
+        </label>
+        <div id="form-errors" class="empty:hidden text-sm lg:text-base 2xl:text-lg text-red-500 mt-2.5 lg:mt-3 2xl:mt-3"></div>
+    {% else %}
+        <div class="flex flex-col justify-center items-center">
+            <span class="hidden lg:inline-flex items-center gap-1.5 font-light text-purple-neutral-500 lg:mb-4.5">
+                <iconify-icon icon="material-symbols:pinch-zoom-out"></iconify-icon>
+                <span>Press to zoom in/out</span>
+            </span>
+            <!-- Photo -->
+            <img src="{{ photo.base64_url }}"
+                 class="max-w-2xs sm:max-w-xs lg:max-w-sm 2xl:max-w-md max-h-[300px] rounded-3xl object-cover mx-auto starting:scale-[1.1] transition-all ease-in-out lg:focus:scale-[2.5] lg:z-10 lg:cursor-pointer outline-0 select-none"
+                 tabindex="0"
+                 draggable="false"
+                 hx-on:keydown="event.key == 'Escape' && this.blur()"
+                 hx-on:mousedown="document.activeElement == this && (event.preventDefault() || this.blur())"
+            />
+            <label class="relative flex items-center group rounded-full lg:text-lg 2xl:text-xl leading-none max-w-[14rem] lg:max-w-3xs 2xl:max-w-2xs w-full px-3.75 lg:px-4 2xl:px-4.5 py-2.75 lg:py-3 2xl:py-3.25 mt-6 lg:mt-6 bg-purple-neutral-900/25 border border-transparent hover:border-purple-neutral-300 has-focus:border-pink-500/50 transition">
+                <iconify-icon icon="uil:question" class="me-2.5 lg:me-3 2xl:me-3.5 text-purple-neutral-300 group-has-focus:text-pink-500 -translate-y-px transition scale-[1.5]"></iconify-icon>
+                <input hx-post="{{ url('games:photo_caption_submit', game_code=game.code) }}"
+                       hx-trigger="input changed delay:300ms, keyup[key=='Enter']"
+                       _="on htmx:afterRequest
+                            if event.detail.successful
+                                set #saved-text's @data-show to 'true'
+                                wait 1s
+                                set #saved-text's @data-show to 'false'"
+                       class="peer w-full font-semibold outline-none placeholder-purple-neutral-500"
+                       type="text"
+                       name="caption"
+                       placeholder="Add caption for photo"
+                       value="{{ photo.caption or '' }}"
+                       maxlength="100"
+                       autofocus
+                />
+                <span id="saved-text"
+                      class="absolute -bottom-6 right-2 text-pink-500 inline-flex items-center data-[show=false]:opacity-0 data-[show=true]:opacity-100 transition"
+                      data-show="false"
+                >
+                    <iconify-icon icon="bi:check2" class="me-1.5 text-xs"></iconify-icon>
+                    <span id="saved-text" class="text-xs">Saved</span>
+                </span>
+            </label>
+        </div>
+    {% endif %}
+</div>
