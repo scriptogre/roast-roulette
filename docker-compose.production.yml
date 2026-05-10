@@ -6,9 +6,6 @@ services:
       args:
         - ENVIRONMENT=production
     expose: [ 8000 ]
-    networks:
-      - proxy
-      - default
     volumes:
       - sqlite:/app/data/:rw
       - staticfiles:/app/staticfiles/:rw
@@ -28,7 +25,3 @@ volumes:
   sqlite:
   staticfiles:
   media:
-
-networks:
-  proxy:
-    external: true
