@@ -5,7 +5,7 @@ services:
       dockerfile: ./compose/django/Dockerfile
       args:
         - ENVIRONMENT=production
-    expose: [ 8000 ]
+    ports: [ "127.0.0.1:18003:8000" ]
     volumes:
       - sqlite:/app/data/:rw
       - staticfiles:/app/staticfiles/:rw
